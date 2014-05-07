@@ -1,0 +1,2 @@
+%{"elli": {:git, "git://github.com/knutin/elli.git", "8c700e734654285885987b164f32e94a39770fac", []},
+  "elli_http_handler": {:git, "git://github.com/kirushik/ellihandler.git", "c9d5e134a7f5c2a167978048749374c5f1fb478f", []}}
