@@ -21,16 +21,13 @@ defmodule AuthStralia.Supervisor do
     ]
   end
 
-  def start_link(stack) do
-    # FIXME: Run elli correctly using supervisor
-    :elli.start_link elli_options
-    
-    :supervisor.start_link(__MODULE__, stack)
+  def start_link([]) do
+    :supervisor.start_link(__MODULE__, [])
   end
 
   def init([]) do
     tree = [ 
-             # worker(:elli, elli_options) 
+             worker(:elli, [elli_options]) 
            ]
     supervise(tree, strategy: :one_for_one)
   end
