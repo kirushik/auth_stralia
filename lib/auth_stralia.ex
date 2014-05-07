@@ -1,0 +1,2 @@
+defmodule AuthStralia do
+end
