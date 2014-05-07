@@ -1,7 +1,10 @@
+Code.require_file "test/test_helper.exs"
+
 defmodule AuthStraliaTest do
   use ExUnit.Case
+  use Localhost
 
-  test "the truth" do
-    assert 1 + 1 == 2
+  test "server starts" do
+    get('/')
   end
 end
