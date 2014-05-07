@@ -10,6 +10,7 @@ defmodule AuthStralia.Supervisor do
   use Supervisor.Behaviour
 
   defp elli_options do
+    {:ok, port} = :application.get_env(:auth_stralia, :listen_on)
     [ 
       callback: :elli_middleware, 
       callback_args: [
@@ -17,7 +18,7 @@ defmodule AuthStralia.Supervisor do
           {AuthStralia.API.V1.Handler, [prefix: "/api/V1/"]}, 
         ]
       ], 
-      port: 3000
+      port: port
     ]
   end
 

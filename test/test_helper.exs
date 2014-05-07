@@ -1,5 +1,4 @@
 ExUnit.start
-:inets.start
 
 defmodule Localhost do
   defmacro __using__(opts) do

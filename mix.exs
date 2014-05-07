@@ -10,25 +10,26 @@ defmodule AuthStralia.Mixfile do
     ]
   end
 
-  # Configuration for the OTP application
-  #
-  # Type `mix help compile.app` for more information
   def application do
     [
       applications: [:inets],
       registered: [:auth_stralia],
-      mod: {AuthStralia, []}
+      mod: {AuthStralia, []},
+
+      env: env(Mix.env)
     ]
   end
 
-  # List all dependencies in the format:
-  #
-  # {:foobar, git: "https://github.com/elixir-lang/foobar.git", tag: "0.1"}
-  #
-  # Type `mix help deps` for more examples and options
   defp deps do
     [
       {:elli_http_handler, github: "kirushik/ellihandler"},
     ]
+  end
+
+  def env(:dev) do
+    [listen_on: 8080]
+  end
+  def  env(:test) do
+    [listen_on: 3000]
   end
 end
