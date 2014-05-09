@@ -12,7 +12,7 @@ defmodule AuthStralia.Mixfile do
 
   def application do
     [
-      applications: [:inets],
+      applications: [:inets, :crypto],
       registered: [:auth_stralia],
       mod: {AuthStralia, []},
 
@@ -23,6 +23,7 @@ defmodule AuthStralia.Mixfile do
   defp deps do
     [
       {:elli_http_handler, github: "kirushik/ellihandler"},
+      {:ejwt, github: "kato-im/ejwt"}
     ]
   end
 

@@ -1,2 +1,6 @@
-%{"elli": {:git, "git://github.com/knutin/elli.git", "8c700e734654285885987b164f32e94a39770fac", []},
-  "elli_http_handler": {:git, "git://github.com/kirushik/ellihandler.git", "c9d5e134a7f5c2a167978048749374c5f1fb478f", []}}
+%{"base64url": {:git, "git://github.com/dvv/base64url.git", "bab9f431693a8888528d5c2db933c6f222c6fd44", [tag: "bab9f431693a8888528d5c2db933c6f222c6fd44"]},
+  "ej": {:git, "git://github.com/seth/ej.git", "0332523799fdbab4b7c8e87074dcf57bb15005a6", [tag: "0332523799fdbab4b7c8e87074dcf57bb15005a6"]},
+  "ejwt": {:git, "git://github.com/kato-im/ejwt.git", "b9fd2971d8bee4d4f74b4a65faf251f0219390b3", []},
+  "elli": {:git, "git://github.com/knutin/elli.git", "8c700e734654285885987b164f32e94a39770fac", []},
+  "elli_http_handler": {:git, "git://github.com/kirushik/ellihandler.git", "c9d5e134a7f5c2a167978048749374c5f1fb478f", []},
+  "jiffy": {:git, "git://github.com/davisp/jiffy", "d16a4fd968e000b65e4678cccfad68d7a0a8bd1c", [tag: "d16a4fd968e000b65e4678cccfad68d7a0a8bd1c"]}}
