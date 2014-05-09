@@ -7,6 +7,6 @@ defmodule AuthStraliaTest do
   test "Correct JSON web token is returned from /token/new endpoint" do
     response = get('/token/new')
     {ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
-    {claims} = :ejwt.parse_jwt(response)
+    {claims} = :ejwt.parse_jwt(response, key)
   end
 end
