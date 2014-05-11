@@ -3,7 +3,12 @@ defmodule AuthStralia.API.V1 do
     use Elli.Handler
 
     get "/token/new" do
-      http_ok "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZUBleGFtcGxlLmNvbSIsImlzcyI6ImF1dGguZXhhbXBsZS5jb20iLCJleHAiOjEzOTk3Mzg1NzgsImp0aSI6IjEyODI0MjNFLUQ1RUUtMTFFMy1CMzY4LTRGN0Q3NEVCMEE1NCJ9.a0f-ey8hsmHjAHHg4RCoUHjaI8cHX8U5-FkwsmFiCv0"
+      data = { sub: "alice@example.com",
+               iss: "auth.example.com",
+               jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" }
+      expiresIn = 86400
+      {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
+      http_ok :ejwt.jwt("HS256",data, expiresIn, key)
     end
   end
 end

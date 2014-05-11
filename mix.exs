@@ -23,7 +23,8 @@ defmodule AuthStralia.Mixfile do
   defp deps do
     [
       {:elli_http_handler, github: "kirushik/ellihandler"},
-      {:ejwt, github: "kato-im/ejwt"}
+      {:ejwt, github: "kato-im/ejwt"},
+      {:amrita, github: "josephwilk/amrita"}
     ]
   end
 
