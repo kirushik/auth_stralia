@@ -2,7 +2,7 @@ defmodule AuthStralia.API.V1 do
   defmodule Handler do
     use Elli.Handler
 
-    get "/token/new" do
+    post "/token/new" do
       data = { sub: "alice@example.com",
                iss: "auth.example.com",
                jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" }
