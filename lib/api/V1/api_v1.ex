@@ -15,6 +15,16 @@ defmodule AuthStralia.API.V1 do
       end
     end
 
+    get "/verify_token", with_params token do
+      {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)    
+
+      res = case :ejwt.parse_jwt(token, key) do
+        { [value|_] } when is_tuple(value) -> "1"
+        _ -> "0"
+      end
+      http_ok res
+    end
+
     #TODO Here goes our database stuff
     defp check_credentials(user_id, password) do
       ("alice@example.com" == user_id) and ("Correct password" == password)
