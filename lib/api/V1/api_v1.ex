@@ -2,7 +2,7 @@ defmodule AuthStralia.API.V1 do
   defmodule Handler do
     use Elli.Handler
 
-    post "/token/new" do
+    post "/login" do
       if (!check_credentials(req.post_arg("user_id"),req.post_arg("password"))) do
         {401, [], "Authorization failed"}
       else
