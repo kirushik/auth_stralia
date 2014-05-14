@@ -29,5 +29,28 @@ defmodule AuthStralia.API.V1 do
     defp check_credentials(user_id, password) do
       ("alice@example.com" == user_id) and ("Correct password" == password)
     end
+
+    post "/session/invalidate" do
+      http_ok "1"
+    end
+  end
+
+  defmodule TokenValidator do
+    use Elli.Handler
+
+    defp key do
+      {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
+      key
+    end
+
+    post "/:action" do
+      token = req.get_header("Bearer")
+
+      if (token != :undefined) and (:ejwt.parse_jwt(token, key)) do
+        elli_ignore
+      else
+        {401, [], "Token incorrect"}
+      end
+    end
   end
 end

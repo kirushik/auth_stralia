@@ -5,9 +5,13 @@ defmodule AuthStraliaTest do
   def correct_id, do: "alice@example.com"
   def correct_password, do: "Correct password"
 
-  def key do
+  defp key do
     {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
     key
+  end
+
+  defp generate_token(contents \\ {[]}, timeout \\ 86400) do
+    :ejwt.jwt("HS256", contents, timeout, key)
   end
 
   describe "/login" do
@@ -17,7 +21,7 @@ defmodule AuthStraliaTest do
     end
   
     it "returns 401 when incorrect password" do
-      post_http_code('/login', %{:user_id => "alice@example.com", :password => "Incorrect password"}) |> 401
+      post_http_code('/login', %{:user_id => correct_id, :password => "Incorrect password"}) |> 401
     end
   end
 
@@ -27,7 +31,7 @@ defmodule AuthStraliaTest do
     end
 
     it "returns '1' for correct token" do
-      token = :ejwt.jwt("HS256", {[]}, 86400, key)
+      token = generate_token
       get('/verify_token?token=#{token}') |> "1"
     end
 
@@ -37,14 +41,19 @@ defmodule AuthStraliaTest do
     end
 
     it "returns '0' for expired token" do
-      token = :ejwt.jwt("HS256", {[]}, -1, key)
+      token = generate_token({[]}, -1)
       get('/verify_token?token=#{token}') |> "0"
     end
   end
 
-  # describe "/session/invalidate" do
-  #   it "fails to work without the token" do
-  #     post_http_code('/session/invalidate', %{}) |> 401
-  #   end
-  # end
+  describe "/session/invalidate" do
+    it "fails to work without the token" do
+      post_http_code('/session/invalidate') |> 401
+    end
+
+    it "works with correct token in Bearer" do
+      token = bitstring_to_list(generate_token({[iss: correct_id]}))
+      post('/session/invalidate', %{}, [{'bearer', token}]) |> "1"
+    end
+  end
 end

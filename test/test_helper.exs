@@ -15,15 +15,15 @@ defmodule Localhost do
         code
       end
 
-      def post(relative_path, params) do
-        params_string = Localhost.params_to_string(params)
-        {:ok, {{_,200,_},_,response}} = Localhost.make_post_request(relative_path, unquote(api_version), params_string)
+      def post(relative_path, params \\ %{}, headers \\ []) do
+        params = Localhost.params_to_string(params)
+        {:ok, {{_,200,_},_,response}} = Localhost.make_post_request(relative_path, unquote(api_version), headers, params)
         list_to_bitstring response
       end
 
-      def post_http_code(relative_path, params) do
+      def post_http_code(relative_path, params \\ %{}, headers \\ []) do
         params = Localhost.params_to_string(params)
-        {:ok, {{_,code,_},_,_}} = Localhost.make_post_request(relative_path, unquote(api_version), params)
+        {:ok, {{_,code,_},_,_}} = Localhost.make_post_request(relative_path, unquote(api_version), headers, params)
         code
       end
     end
@@ -39,11 +39,11 @@ defmodule Localhost do
     port
   end
 
-  def make_post_request(relative_path, api_version, params) do
+  def make_post_request(relative_path, api_version, headers, params) do
     :httpc.request(
       :post, 
       {  'http://localhost:#{port}/api/#{api_version}#{relative_path}',
-        [], 
+        headers, 
         'application/x-www-form-urlencoded',
         params},
       [], [])
