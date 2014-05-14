@@ -2,10 +2,17 @@ defmodule AuthStraliaTest do
   use Amrita.Sweet
   use Localhost
 
+  def correct_id, do: "alice@example.com"
+  def correct_password, do: "Correct password"
+
+  def key do
+    {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
+    key
+  end
+
   describe "/login" do
     it "returns correct JSON web token" do
-      response = post('/login', %{:user_id => "alice@example.com", :password => "Correct password"})
-      {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
+      response = post('/login', %{:user_id => correct_id, :password => correct_password })
       {_claims} = :ejwt.parse_jwt(response, key)
     end
   
@@ -20,7 +27,6 @@ defmodule AuthStraliaTest do
     end
 
     it "returns '1' for correct token" do
-      {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
       token = :ejwt.jwt("HS256", {[]}, 86400, key)
       get('/verify_token?token=#{token}') |> "1"
     end
@@ -31,9 +37,14 @@ defmodule AuthStraliaTest do
     end
 
     it "returns '0' for expired token" do
-      {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
       token = :ejwt.jwt("HS256", {[]}, -1, key)
       get('/verify_token?token=#{token}') |> "0"
     end
   end
+
+  # describe "/session/invalidate" do
+  #   it "fails to work without the token" do
+  #     post_http_code('/session/invalidate', %{}) |> 401
+  #   end
+  # end
 end

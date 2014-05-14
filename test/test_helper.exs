@@ -6,8 +6,13 @@ defmodule Localhost do
 
     quote bind_quoted: [api_version: api_version] do
       def get(relative_path) do
-        {:ok, {{_,200,_},_,response}} = :httpc.request('http://localhost:3000/api/'++ unquote(api_version) ++ relative_path)
+        {:ok, {{_,200,_},_,response}} = Localhost.make_get_request(relative_path, unquote(api_version))
         list_to_bitstring response
+      end
+
+      def get_http_code(relative_path) do
+        {:ok, {{_,code,_},_,_}} = Localhost.make_get_request(relative_path, unquote(api_version))
+        code
       end
 
       def post(relative_path, params) do
@@ -29,13 +34,23 @@ defmodule Localhost do
     Enum.join(param_strings, "&")
   end
 
+  def port do
+    {:ok, port} = :application.get_env(:auth_stralia, :listen_on)
+    port
+  end
+
   def make_post_request(relative_path, api_version, params) do
     :httpc.request(
       :post, 
-      { 'http://localhost:3000/api/'++ api_version ++ relative_path, 
+      {  'http://localhost:#{port}/api/#{api_version}#{relative_path}',
         [], 
         'application/x-www-form-urlencoded',
         params},
       [], [])
   end
+
+  def make_get_request(relative_path, api_version) do
+    :httpc.request 'http://localhost:#{port}/api/#{api_version}#{relative_path}'
+  end
+  
 end
