@@ -52,8 +52,7 @@ defmodule AuthStralia.API.V1 do
 
     defp get_token_field(token, name) do
       {parsed_token} = :ejwt.parse_jwt(token, key)
-      {:ok, res} =  Dict.fetch(parsed_token, name)
-      res
+      :proplists.get_value(name, parsed_token)
     end
 
     #TODO It should come in separate module to be included everywhere
