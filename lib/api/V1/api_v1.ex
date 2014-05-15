@@ -33,16 +33,17 @@ defmodule AuthStralia.API.V1 do
       http_ok res
     end
 
-    def get_sub_from_request(req) do
-      
-    end
-    
-
     post "/session/invalidate" do
       token = req.get_header("Bearer")
       sub = get_token_field(token, "sub")
       jti = get_token_field(token, "jti")
       http_ok Sessions.remove(sub, jti)
+    end
+
+    post "/session/invalidate/all" do
+      token = req.get_header("Bearer")
+      sub = get_token_field(token, "sub")
+      http_ok Sessions.remove_all(sub)
     end
 
     #TODO Here goes our database stuff

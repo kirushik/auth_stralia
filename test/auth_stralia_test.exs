@@ -72,4 +72,18 @@ defmodule AuthStraliaTest do
       get('/verify_token?token=#{token}') |> "0"
     end
   end
+
+  describe "/sessions/invalidate/all" do
+    it "invalidates two tokens at once" do
+      token1 = bitstring_to_list(post('/login', %{:user_id => correct_id, :password => correct_password }))
+      token2 = bitstring_to_list(post('/login', %{:user_id => correct_id, :password => correct_password }))
+      get('/verify_token?token=#{token1}') |> "1"
+      get('/verify_token?token=#{token2}') |> "1"
+
+      post('/session/invalidate/all', %{}, [{'bearer', token1}]) |> "1"
+
+      get('/verify_token?token=#{token1}') |> "0"
+      get('/verify_token?token=#{token2}') |> "0"
+    end
+  end
 end

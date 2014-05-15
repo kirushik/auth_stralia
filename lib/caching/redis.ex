@@ -6,5 +6,6 @@ defmodule AuthStralia.Caching do
     def check(key, value), do: start |> query ["SISMEMBER", key, value]
     def list(key), do: start |> query ["SMEMBERS", key]
     def remove(key, value), do: start |> query ["SREM", key, value]
+    def remove_all(key), do: start |> query ["DEL", key]
   end
 end
