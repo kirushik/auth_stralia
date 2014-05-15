@@ -2,15 +2,18 @@ defmodule AuthStraliaTest do
   use Amrita.Sweet
   use Localhost
 
-  def correct_id, do: "alice@example.com"
-  def correct_password, do: "Correct password"
+  defp correct_id, do: "alice@example.com"
+  defp correct_password, do: "Correct password"
 
   defp key do
     {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
     key
   end
 
-  defp generate_token(contents \\ {[]}, timeout \\ 86400) do
+  defp generate_token(contents \\ { sub: correct_id,
+                                    iss: "auth.example.com",
+                                    jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" },
+                      timeout \\ 86400) do
     :ejwt.jwt("HS256", contents, timeout, key)
   end
 
@@ -52,8 +55,14 @@ defmodule AuthStraliaTest do
     end
 
     it "works with correct token in Bearer" do
-      token = bitstring_to_list(generate_token({[iss: correct_id]}))
+      token = bitstring_to_list(post('/login', %{:user_id => correct_id, :password => correct_password }))
       post('/session/invalidate', %{}, [{'bearer', token}]) |> "1"
+    end
+
+    it "invalidates token" do
+      token = bitstring_to_list(post('/login', %{:user_id => correct_id, :password => correct_password }))
+      post('/session/invalidate', %{}, [{'bearer', token}]) |> "1"
+      post('/session/invalidate', %{}, [{'bearer', token}]) |> "0"
     end
   end
 end

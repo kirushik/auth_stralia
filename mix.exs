@@ -12,7 +12,7 @@ defmodule AuthStralia.Mixfile do
 
   def application do
     [
-      applications: [:inets, :crypto],
+      applications: [:inets, :crypto, :exredis],
       registered: [:auth_stralia],
       mod: {AuthStralia, []},
 
@@ -24,7 +24,9 @@ defmodule AuthStralia.Mixfile do
     [
       {:elli_http_handler, github: "kirushik/ellihandler"},
       {:ejwt, github: "kato-im/ejwt"},
-      {:amrita, github: "josephwilk/amrita"}
+      {:amrita, github: "josephwilk/amrita"},
+      {:exredis, github: "artemeff/exredis"},
+      {:uuid, github: "avtobiff/erlang-uuid", tag: "v0.4.6"}
     ]
   end
 

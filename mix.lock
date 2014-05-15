@@ -4,8 +4,11 @@
   "ejwt": {:git, "git://github.com/kato-im/ejwt.git", "b9fd2971d8bee4d4f74b4a65faf251f0219390b3", []},
   "elli": {:git, "git://github.com/knutin/elli.git", "8c700e734654285885987b164f32e94a39770fac", []},
   "elli_http_handler": {:git, "git://github.com/kirushik/ellihandler.git", "c9d5e134a7f5c2a167978048749374c5f1fb478f", []},
+  "eredis": {:git, "git://github.com/wooga/eredis.git", "e223e9e1496dcf1ec9e16f3f23b13db122748839", []},
   "exlager": {:git, "git://github.com/khia/exlager.git", "d3d73b2a3d0f7b8f3da11a02b5f9384da6c62110", []},
+  "exredis": {:git, "git://github.com/artemeff/exredis.git", "b3e1a93f1d07a26b4f9599951959eee007c266c9", []},
   "goldrush": {:git, "git://github.com/DeadZen/goldrush.git", "71e63212f12c25827e0c1b4198d37d5d018a7fec", [tag: "0.1.6"]},
   "jiffy": {:git, "git://github.com/davisp/jiffy", "d16a4fd968e000b65e4678cccfad68d7a0a8bd1c", [tag: "d16a4fd968e000b65e4678cccfad68d7a0a8bd1c"]},
   "lager": {:git, "https://github.com/basho/lager.git", "4d8291edb72a25ac0efde907e2ecaa115108ff90", []},
-  "meck": {:git, "git://github.com/eproxus/meck.git", "2eb19524a0cf33a0fc67fed766679c93d363ceee", [branch: "master"]}}
+  "meck": {:git, "git://github.com/eproxus/meck.git", "2eb19524a0cf33a0fc67fed766679c93d363ceee", [branch: "master"]},
+  "uuid": {:git, "git://github.com/avtobiff/erlang-uuid.git", "7c8a3bb79d8a0a3092ffa75332a91958d5438c39", [tag: "v0.4.6"]}}
