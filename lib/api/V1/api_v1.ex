@@ -27,15 +27,21 @@ defmodule AuthStralia.API.V1 do
       {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)    
 
       res = case :ejwt.parse_jwt(token, key) do
-        { [value|_] } when is_tuple(value) -> "1"
+        { [value|_] } when is_tuple(value) -> Sessions.check(get_token_field(token, "sub"), get_token_field(token, "jti"))
         _ -> "0"
       end
       http_ok res
     end
 
+    def get_sub_from_request(req) do
+      
+    end
+    
+
     post "/session/invalidate" do
-      sub = get_token_field(req, "sub")
-      jti = get_token_field(req, "jti")
+      token = req.get_header("Bearer")
+      sub = get_token_field(token, "sub")
+      jti = get_token_field(token, "jti")
       http_ok Sessions.remove(sub, jti)
     end
 
@@ -44,8 +50,7 @@ defmodule AuthStralia.API.V1 do
       ("alice@example.com" == user_id) and ("Correct password" == password)
     end
 
-    defp get_token_field(req, name) do
-      token = req.get_header("Bearer")
+    defp get_token_field(token, name) do
       {parsed_token} = :ejwt.parse_jwt(token, key)
       {:ok, res} =  Dict.fetch(parsed_token, name)
       res

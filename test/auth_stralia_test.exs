@@ -34,7 +34,7 @@ defmodule AuthStraliaTest do
     end
 
     it "returns '1' for correct token" do
-      token = generate_token
+      token = bitstring_to_list(post('/login', %{:user_id => correct_id, :password => correct_password }))
       get('/verify_token?token=#{token}') |> "1"
     end
 
@@ -45,6 +45,11 @@ defmodule AuthStraliaTest do
 
     it "returns '0' for expired token" do
       token = generate_token({[]}, -1)
+      get('/verify_token?token=#{token}') |> "0"
+    end
+
+    it "returns '0' for nonexisting token" do
+      token = generate_token
       get('/verify_token?token=#{token}') |> "0"
     end
   end
