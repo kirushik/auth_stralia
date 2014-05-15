@@ -66,8 +66,10 @@ defmodule AuthStraliaTest do
 
     it "invalidates token" do
       token = bitstring_to_list(post('/login', %{:user_id => correct_id, :password => correct_password }))
+      get('/verify_token?token=#{token}') |> "1"
       post('/session/invalidate', %{}, [{'bearer', token}]) |> "1"
       post('/session/invalidate', %{}, [{'bearer', token}]) |> "0"
+      get('/verify_token?token=#{token}') |> "0"
     end
   end
 end
