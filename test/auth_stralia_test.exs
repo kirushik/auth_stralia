@@ -17,6 +17,11 @@ defmodule AuthStraliaTest do
     :ejwt.jwt("HS256", contents, timeout, key)
   end
 
+  defp extract_jti_from_token(token) do
+    {parsed_token} = :ejwt.parse_jwt(token, key)
+    :proplists.get_value("jti", parsed_token)
+  end
+
   describe "/login" do
     it "returns correct JSON web token" do
       response = post('/login', %{:user_id => correct_id, :password => correct_password })
@@ -73,6 +78,14 @@ defmodule AuthStraliaTest do
     end
 
     it "invalidates other tokes by 'jti' value" do
+      token1 = bitstring_to_list(post('/login', %{:user_id => correct_id, :password => correct_password }))
+      token2 = post('/login', %{:user_id => correct_id, :password => correct_password })
+      jti = extract_jti_from_token(token2)
+
+      get('/verify_token?token=#{token2}') |> "1"
+      post('/session/invalidate', %{:jti => jti}, [{'bearer', token1}]) |> "1"
+      get('/verify_token?token=#{token1}') |> "1"
+      get('/verify_token?token=#{token2}') |> "0"
     end
   end
 
@@ -90,6 +103,7 @@ defmodule AuthStraliaTest do
     end
 
     it "fails without proper token" do
+      post_http_code('/session/invalidate/all') |> 401
     end
   end
 end

@@ -35,8 +35,12 @@ defmodule AuthStralia.API.V1 do
 
     post "/session/invalidate" do
       token = req.get_header("Bearer")
+
       sub = get_token_field(token, "sub")
-      jti = get_token_field(token, "jti")
+      jti = req.post_arg("jti")
+      if jti==:undefined do
+        jti = get_token_field(token, "jti")
+      end
       http_ok Sessions.remove(sub, jti)
     end
 
