@@ -71,6 +71,9 @@ defmodule AuthStraliaTest do
       post('/session/invalidate', %{}, [{'bearer', token}]) |> "0"
       get('/verify_token?token=#{token}') |> "0"
     end
+
+    it "invalidates other tokes by 'jti' value" do
+    end
   end
 
   describe "/sessions/invalidate/all" do
@@ -84,6 +87,9 @@ defmodule AuthStraliaTest do
 
       get('/verify_token?token=#{token1}') |> "0"
       get('/verify_token?token=#{token2}') |> "0"
+    end
+
+    it "fails without proper token" do
     end
   end
 end

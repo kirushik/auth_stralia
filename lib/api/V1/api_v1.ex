@@ -73,8 +73,7 @@ defmodule AuthStralia.API.V1 do
       {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
       key
     end
-
-    post "/:action" do
+    defp protect_by_token(req) do
       token = req.get_header("Bearer")
 
       if (token != :undefined) and (:ejwt.parse_jwt(token, key)) do
@@ -82,6 +81,13 @@ defmodule AuthStralia.API.V1 do
       else
         {401, [], "Token incorrect"}
       end
+    end
+
+    post "/:action" do
+      protect_by_token(req)
+    end
+    post "/:action/all" do
+      protect_by_token(req)
     end
   end
 end
