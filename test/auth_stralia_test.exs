@@ -17,7 +17,12 @@ defmodule AuthStraliaTest do
     :ejwt.jwt("HS256", contents, timeout, key)
   end
 
-  defp extract_jti_from_token(token) do
+  defp extract_jti_from_token(token) when is_bitstring(token) do
+    {parsed_token} = :ejwt.parse_jwt(token, key)
+    :proplists.get_value("jti", parsed_token)
+  end
+  defp extract_jti_from_token(token) when is_list(token) do
+    token = list_to_bitstring token
     {parsed_token} = :ejwt.parse_jwt(token, key)
     :proplists.get_value("jti", parsed_token)
   end
@@ -89,7 +94,7 @@ defmodule AuthStraliaTest do
     end
   end
 
-  describe "/sessions/invalidate/all" do
+  describe "/session/invalidate/all" do
     it "invalidates two tokens at once" do
       token1 = bitstring_to_list(post('/login', %{:user_id => correct_id, :password => correct_password }))
       token2 = bitstring_to_list(post('/login', %{:user_id => correct_id, :password => correct_password }))
@@ -104,6 +109,27 @@ defmodule AuthStraliaTest do
 
     it "fails without proper token" do
       post_http_code('/session/invalidate/all') |> 401
+    end
+  end
+
+  describe "/session/list" do
+    it "fails without proper token" do
+      post_http_code('/session/list') |> 401
+    end
+
+    it "lists all sessions" do
+      token0 = bitstring_to_list(post('/login', %{:user_id => correct_id, :password => correct_password }))
+      # Ensure there are no sessions for our user
+      post('/session/invalidate/all', %{}, [{'bearer', token0}])
+
+
+      token1 = bitstring_to_list(post('/login', %{:user_id => correct_id, :password => correct_password }))
+      token2 = bitstring_to_list(post('/login', %{:user_id => correct_id, :password => correct_password }))
+
+      {:ok, sessions} = JSON.decode get('/session/list', [{'bearer', token1}])
+      length(sessions) |> 2
+      sessions |> contains extract_jti_from_token(token1)
+      sessions |> contains extract_jti_from_token(token2)
     end
   end
 end

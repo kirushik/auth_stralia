@@ -50,6 +50,15 @@ defmodule AuthStralia.API.V1 do
       http_ok Sessions.remove_all(sub)
     end
 
+    get "/session/list" do
+      token = req.get_header("Bearer")
+      sub = get_token_field(token, "sub")
+      http_ok JSON.encode!(Sessions.list(sub))
+    end
+################################################################################################################################
+## PRIVATE
+################################################################################################################################
+
     #TODO Here goes our database stuff
     defp check_credentials(user_id, password) do
       ("alice@example.com" == user_id) and ("Correct password" == password)

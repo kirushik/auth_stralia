@@ -26,7 +26,8 @@ defmodule AuthStralia.Mixfile do
       {:ejwt, github: "kato-im/ejwt"},
       {:amrita, github: "josephwilk/amrita"},
       {:exredis, github: "artemeff/exredis"},
-      {:uuid, github: "avtobiff/erlang-uuid", tag: "v0.4.6"}
+      {:uuid, github: "avtobiff/erlang-uuid", tag: "v0.4.6"},
+      {:json, github: "cblage/elixir-json"}
     ]
   end
 
