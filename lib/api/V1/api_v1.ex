@@ -4,6 +4,7 @@ defmodule AuthStralia.API.V1 do
 
     alias AuthStralia.Caching.Sessions, as: Sessions
 
+    #TODO Extract all token operations in separate module
     post "/login" do
       uid = req.post_arg("user_id")
       session_id = generate_uuid()
@@ -14,7 +15,6 @@ defmodule AuthStralia.API.V1 do
         data = { sub: uid,
                  iss: "auth.example.com",
                  jti: session_id }
-        expiresIn = 86400
         {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
 
         Sessions.add(uid, session_id)
@@ -55,6 +55,11 @@ defmodule AuthStralia.API.V1 do
       sub = get_token_field(token, "sub")
       http_ok JSON.encode!(Sessions.list(sub))
     end
+
+    post "/session/update" do
+      token = req.get_header("Bearer")
+      http_ok set_expiration_time(token, expiresIn)
+    end
 ################################################################################################################################
 ## PRIVATE
 ################################################################################################################################
@@ -74,8 +79,21 @@ defmodule AuthStralia.API.V1 do
       {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
       key
     end
+    defp expiresIn do
+      expiresIn = 86400
+    end
     defp generate_uuid do
       list_to_bitstring( :uuid.to_string(:uuid.uuid4()))
+    end
+
+    defp set_expiration_time(token, new_timeout) do
+      {parsed_token} = :ejwt.parse_jwt(token, key)
+      contents = :lists.map(
+        fn({a,b})->
+          {binary_to_atom(a),b }; 
+        end, parsed_token)
+      contents = {:proplists.delete(:exp, contents)}
+      :ejwt.jwt("HS256",contents, new_timeout, key)
     end
   end
 

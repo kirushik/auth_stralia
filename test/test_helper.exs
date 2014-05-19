@@ -40,6 +40,7 @@ defmodule Localhost do
   end
 
   def make_post_request(relative_path, api_version, headers, params) do
+    headers = prepare_headers headers
     :httpc.request(
       :post, 
       { 
@@ -52,6 +53,7 @@ defmodule Localhost do
   end
 
   def make_get_request(relative_path, api_version, headers) do
+    headers = prepare_headers headers
     :httpc.request(
       :get,
       { 
@@ -60,5 +62,12 @@ defmodule Localhost do
       },
       [], [])
   end
-  
+
+  defp prepare_headers(headers) do
+    :lists.map(
+      fn({a,b}) -> 
+        {:ok, b} = List.from_char_data(b);
+        {a,b};
+      end, headers)  
+  end  
 end
