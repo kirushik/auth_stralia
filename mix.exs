@@ -14,7 +14,7 @@ defmodule AuthStralia.Mixfile do
 
   def application do
     [
-      applications: [:inets, :crypto, :exredis],
+      applications: [:inets, :crypto, :exredis, :postgrex, :ecto],
       registered: [:auth_stralia],
       mod: {AuthStralia, []},
 

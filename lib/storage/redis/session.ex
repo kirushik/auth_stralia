@@ -5,7 +5,7 @@ defmodule AuthStralia.Redis do
     alias Settings, as: S
 
     # Key format is 'session:user_id:session_id'
-    #TODO: — add useful info (ip?) about session in sored value
+    #TODO: add some useful info (ip?) about session in sored value
     def new(user_id, session_id) do
       key = "session:#{user_id}:#{session_id}"
       start |> query ["SETEX", key, S.expiresIn, "1"]

@@ -30,7 +30,8 @@ defmodule AuthStralia.Supervisor do
 
   def init([]) do
     tree = [ 
-             worker(:elli, [elli_options]) 
+             worker(:elli, [elli_options]) ,
+             worker(AuthStralia.Storage.DB, [])
            ]
     supervise(tree, strategy: :one_for_one)
   end
