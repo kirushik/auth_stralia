@@ -4,7 +4,7 @@ defmodule AuthStralia.API.V1 do
 
     alias AuthStralia.Caching.Sessions, as: Sessions
 
-    #TODO Extract all token operations in separate module
+    #TODO: Extract all token operations in separate module
     post "/login" do
       uid = req.post_arg("user_id")
       session_id = generate_uuid()
@@ -17,7 +17,7 @@ defmodule AuthStralia.API.V1 do
                  jti: session_id }
         {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
 
-        Sessions.add(uid, session_id)
+        Sessions.new(uid, session_id)
 
         http_ok :ejwt.jwt("HS256",data, expiresIn, key)
       end
@@ -64,7 +64,7 @@ defmodule AuthStralia.API.V1 do
 ## PRIVATE
 ################################################################################################################################
 
-    #TODO Here goes our database stuff
+    #TODO: Here goes our database stuff
     defp check_credentials(user_id, password) do
       ("alice@example.com" == user_id) and ("Correct password" == password)
     end
@@ -74,13 +74,14 @@ defmodule AuthStralia.API.V1 do
       :proplists.get_value(name, parsed_token)
     end
 
-    #TODO It should come in separate module to be included everywhere
+    #TODO: It should come in separate module to be included everywhere
     defp key do
       {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
       key
     end
     defp expiresIn do
-      expiresIn = 86400
+      {:ok, expiresIn} = :application.get_env(:auth_stralia, :expires_in)
+      expiresIn
     end
     defp generate_uuid do
       list_to_bitstring( :uuid.to_string(:uuid.uuid4()))
@@ -114,10 +115,8 @@ defmodule AuthStralia.API.V1 do
       end
     end
 
-    post "/:action" do
-      protect_by_token(req)
-    end
-    post "/:action/all" do
+    # Handle every request — typical 'post' macro is not useful
+    def handle(:POST, _path, req) do
       protect_by_token(req)
     end
   end

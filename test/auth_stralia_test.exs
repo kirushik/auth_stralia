@@ -111,12 +111,15 @@ defmodule AuthStraliaTest do
 
   describe "/session/invalidate/all" do
     it "invalidates two tokens at once" do
+      token0 = get_new_token
+      post('/session/invalidate/all', %{}, [{'bearer', token0}])
+
       token1 = get_new_token
       token2 = get_new_token
       get('/verify_token?token=#{token1}') |> "1"
       get('/verify_token?token=#{token2}') |> "1"
 
-      post('/session/invalidate/all', %{}, [{'bearer', token1}]) |> "1"
+      post('/session/invalidate/all', %{}, [{'bearer', token1}]) |> "2"
 
       get('/verify_token?token=#{token1}') |> "0"
       get('/verify_token?token=#{token2}') |> "0"
@@ -155,9 +158,9 @@ defmodule AuthStraliaTest do
 
     it "updates token expiration time" do
       token = get_new_token
-      token = set_expiration_time(token, 10)
+      token = set_expiration_time(token, 3)
       new_token = post('/session/update', %{}, [{'bearer', token}])
-      get_expiration_time(new_token) > 10 |> truthy # Not the best way, certainly
+      (get_expiration_time(new_token) > 3) |> truthy # Not the best way, certainly
     end
   end
 end
