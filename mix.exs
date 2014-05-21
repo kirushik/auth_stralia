@@ -5,7 +5,7 @@ defmodule AuthStralia.Mixfile do
     [
       app: :auth_stralia,
       version: "0.0.1",
-      elixir: "~> 0.13.1",
+      elixir: "0.13.1",
       deps: deps
     ]
   end
@@ -27,7 +27,9 @@ defmodule AuthStralia.Mixfile do
       {:amrita, github: "josephwilk/amrita"},
       {:exredis, github: "artemeff/exredis"},
       {:uuid, github: "avtobiff/erlang-uuid", tag: "v0.4.6"},
-      {:json, github: "cblage/elixir-json"}
+      {:json, github: "cblage/elixir-json"},
+      {:postgrex, github: "ericmj/postgrex", tag: "v0.5.0", override: true},
+      {:ecto, "0.1.0"}
     ]
   end
 
