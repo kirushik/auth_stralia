@@ -1,6 +1,8 @@
 Amrita.start
 
 defmodule Localhost do
+  alias Settings, as: S
+
   defmacro __using__(opts) do
     api_version = opts[:version] || 'V1'
 
@@ -34,17 +36,12 @@ defmodule Localhost do
     Enum.join(param_strings, "&")
   end
 
-  def port do
-    {:ok, port} = :application.get_env(:auth_stralia, :listen_on)
-    port
-  end
-
   def make_post_request(relative_path, api_version, headers, params) do
     headers = prepare_headers headers
     :httpc.request(
       :post, 
       { 
-        'http://localhost:#{port}/api/#{api_version}#{relative_path}',
+        'http://localhost:#{S.port}/api/#{api_version}#{relative_path}',
         headers, 
         'application/x-www-form-urlencoded',
         params
@@ -57,7 +54,7 @@ defmodule Localhost do
     :httpc.request(
       :get,
       { 
-        'http://localhost:#{port}/api/#{api_version}#{relative_path}',
+        'http://localhost:#{S.port}/api/#{api_version}#{relative_path}',
         headers
       },
       [], [])
