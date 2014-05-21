@@ -2,7 +2,7 @@ defmodule AuthStralia.API.V1 do
   defmodule Handler do
     use Elli.Handler
 
-    alias AuthStralia.Caching.Sessions, as: Sessions
+    alias AuthStralia.Caching.Session, as: Session
 
     #TODO: Extract all token operations in separate module
     post "/login" do
@@ -17,7 +17,7 @@ defmodule AuthStralia.API.V1 do
                  jti: session_id }
         {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
 
-        Sessions.new(uid, session_id)
+        Session.new(uid, session_id)
 
         http_ok :ejwt.jwt("HS256",data, expiresIn, key)
       end
@@ -27,7 +27,7 @@ defmodule AuthStralia.API.V1 do
       {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)    
 
       res = case :ejwt.parse_jwt(token, key) do
-        { [value|_] } when is_tuple(value) -> Sessions.check(get_token_field(token, "sub"), get_token_field(token, "jti"))
+        { [value|_] } when is_tuple(value) -> Session.check(get_token_field(token, "sub"), get_token_field(token, "jti"))
         _ -> "0"
       end
       http_ok res
@@ -41,19 +41,19 @@ defmodule AuthStralia.API.V1 do
       if jti==:undefined do
         jti = get_token_field(token, "jti")
       end
-      http_ok Sessions.remove(sub, jti)
+      http_ok Session.remove(sub, jti)
     end
 
     post "/session/invalidate/all" do
       token = req.get_header("Bearer")
       sub = get_token_field(token, "sub")
-      http_ok Sessions.remove_all(sub)
+      http_ok Session.remove_all(sub)
     end
 
     get "/session/list" do
       token = req.get_header("Bearer")
       sub = get_token_field(token, "sub")
-      http_ok JSON.encode!(Sessions.list(sub))
+      http_ok JSON.encode!(Session.list(sub))
     end
 
     post "/session/update" do

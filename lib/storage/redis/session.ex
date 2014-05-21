@@ -1,5 +1,5 @@
 defmodule AuthStralia.Caching do
-  defmodule Sessions do
+  defmodule Session do
     use Exredis
 
     # Key format is 'session:user_id:session_id'
