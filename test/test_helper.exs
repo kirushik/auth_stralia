@@ -5,8 +5,8 @@ defmodule Localhost do
     api_version = opts[:version] || 'V1'
 
     quote bind_quoted: [api_version: api_version] do
-      def get(relative_path) do
-        {:ok, {{_,200,_},_,response}} = Localhost.make_get_request(relative_path, unquote(api_version))
+      def get(relative_path, headers \\ []) do
+        {:ok, {{_,200,_},_,response}} = Localhost.make_get_request(relative_path, unquote(api_version), headers)
         list_to_bitstring response
       end
 
@@ -40,17 +40,34 @@ defmodule Localhost do
   end
 
   def make_post_request(relative_path, api_version, headers, params) do
+    headers = prepare_headers headers
     :httpc.request(
       :post, 
-      {  'http://localhost:#{port}/api/#{api_version}#{relative_path}',
+      { 
+        'http://localhost:#{port}/api/#{api_version}#{relative_path}',
         headers, 
         'application/x-www-form-urlencoded',
-        params},
+        params
+      },
       [], [])
   end
 
-  def make_get_request(relative_path, api_version) do
-    :httpc.request 'http://localhost:#{port}/api/#{api_version}#{relative_path}'
+  def make_get_request(relative_path, api_version, headers) do
+    headers = prepare_headers headers
+    :httpc.request(
+      :get,
+      { 
+        'http://localhost:#{port}/api/#{api_version}#{relative_path}',
+        headers
+      },
+      [], [])
   end
-  
+
+  defp prepare_headers(headers) do
+    :lists.map(
+      fn({a,b}) -> 
+        {:ok, b} = List.from_char_data(b);
+        {a,b};
+      end, headers)  
+  end  
 end

@@ -9,6 +9,7 @@
   "exredis": {:git, "git://github.com/artemeff/exredis.git", "b3e1a93f1d07a26b4f9599951959eee007c266c9", []},
   "goldrush": {:git, "git://github.com/DeadZen/goldrush.git", "71e63212f12c25827e0c1b4198d37d5d018a7fec", [tag: "0.1.6"]},
   "jiffy": {:git, "git://github.com/davisp/jiffy", "d16a4fd968e000b65e4678cccfad68d7a0a8bd1c", [tag: "d16a4fd968e000b65e4678cccfad68d7a0a8bd1c"]},
+  "json": {:git, "git://github.com/cblage/elixir-json.git", "a50642c957a017fdcff4b06337b211f85bc8f653", []},
   "lager": {:git, "https://github.com/basho/lager.git", "4d8291edb72a25ac0efde907e2ecaa115108ff90", []},
   "meck": {:git, "git://github.com/eproxus/meck.git", "2eb19524a0cf33a0fc67fed766679c93d363ceee", [branch: "master"]},
   "uuid": {:git, "git://github.com/avtobiff/erlang-uuid.git", "7c8a3bb79d8a0a3092ffa75332a91958d5438c39", [tag: "v0.4.6"]}}
