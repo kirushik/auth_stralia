@@ -6,7 +6,6 @@ defmodule AuthStralia.API.V1 do
     alias AuthStralia.Storage.User, as: User
     alias Settings, as: S
 
-    #TODO: Extract all token operations in separate module
     post "/login" do
       uid = req.post_arg("user_id")
       session_id = UUID.generate
