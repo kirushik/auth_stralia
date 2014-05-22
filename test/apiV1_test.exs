@@ -1,15 +1,12 @@
-defmodule AuthStraliaTest do
+defmodule ApiV1Test do
   use Amrita.Sweet
   use Localhost
 
   defp correct_id, do: "alice@example.com"
-  defp correct_password, do: "Correct password"
+  defp correct_password, do: "CorrectPassword"
   defp get_new_token, do: post('/login', %{:user_id => correct_id, :password => correct_password })
 
-  defp key do
-    {:ok, key} = :application.get_env(:auth_stralia, :jwt_secret)
-    key
-  end
+  alias Settings, as: S
 
   # Can be better. Borrowed from EJWT code itself
   defp epoch do
@@ -20,11 +17,17 @@ defmodule AuthStraliaTest do
                                     iss: "auth.example.com",
                                     jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" },
                       timeout \\ 86400) do
-    :ejwt.jwt("HS256", contents, timeout, key)
+    :ejwt.jwt("HS256", contents, timeout, S.jwt_secret)
+  end
+
+  setup_all do
+    AuthStralia.Storage.DB.delete_all AuthStralia.Storage.User
+    AuthStralia.Storage.User.create(correct_id, correct_password)
+    :ok
   end
 
   defp set_expiration_time(token, new_timeout) do
-    {parsed_token} = :ejwt.parse_jwt(token, key)
+    {parsed_token} = :ejwt.parse_jwt(token, S.jwt_secret)
     contents = :lists.map(
       fn({a,b})->
         {binary_to_atom(a),b }; 
@@ -33,19 +36,19 @@ defmodule AuthStraliaTest do
     generate_token(contents, new_timeout)
   end
   defp get_expiration_time(token) do
-    {parsed_token} = :ejwt.parse_jwt(token, key)
+    {parsed_token} = :ejwt.parse_jwt(token, S.jwt_secret)
     :proplists.get_value("exp", parsed_token) - epoch()
   end
 
   defp extract_jti_from_token(token) do
-    {parsed_token} = :ejwt.parse_jwt(token, key)
+    {parsed_token} = :ejwt.parse_jwt(token, S.jwt_secret)
     :proplists.get_value("jti", parsed_token)
   end
 
   describe "/login" do
     it "returns correct JSON web token" do
       response = post('/login', %{:user_id => correct_id, :password => correct_password })
-      {_claims} = :ejwt.parse_jwt(response, key)
+      {_claims} = :ejwt.parse_jwt(response, S.jwt_secret)
     end
   
     it "returns 401 when incorrect password" do

@@ -9,8 +9,9 @@ end
 defmodule AuthStralia.Supervisor do
   use Supervisor.Behaviour
 
+  alias Settings, as: S
+
   defp elli_options do
-    {:ok, port} = :application.get_env(:auth_stralia, :listen_on)
     [ 
       callback: :elli_middleware, 
       callback_args: [
@@ -19,7 +20,7 @@ defmodule AuthStralia.Supervisor do
           {AuthStralia.API.V1.Handler, [prefix: "/api/V1/"]}
         ]
       ], 
-      port: port
+      port: S.port
     ]
   end
 
@@ -29,7 +30,8 @@ defmodule AuthStralia.Supervisor do
 
   def init([]) do
     tree = [ 
-             worker(:elli, [elli_options]) 
+             worker(:elli, [elli_options]) ,
+             worker(AuthStralia.Storage.DB, [])
            ]
     supervise(tree, strategy: :one_for_one)
   end
