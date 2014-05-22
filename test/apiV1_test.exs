@@ -3,7 +3,7 @@ defmodule ApiV1Test do
   use Localhost
 
   defp correct_id, do: "alice@example.com"
-  defp correct_password, do: "Correct password"
+  defp correct_password, do: "CorrectPassword"
   defp get_new_token, do: post('/login', %{:user_id => correct_id, :password => correct_password })
 
   alias Settings, as: S
@@ -18,6 +18,12 @@ defmodule ApiV1Test do
                                     jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" },
                       timeout \\ 86400) do
     :ejwt.jwt("HS256", contents, timeout, S.jwt_secret)
+  end
+
+  setup_all do
+    AuthStralia.Storage.DB.delete_all AuthStralia.Storage.User
+    AuthStralia.Storage.User.create(correct_id, correct_password)
+    :ok
   end
 
   defp set_expiration_time(token, new_timeout) do

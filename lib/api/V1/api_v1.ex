@@ -3,6 +3,7 @@ defmodule AuthStralia.API.V1 do
     use Elli.Handler
 
     alias AuthStralia.Redis.Session, as: Session
+    alias AuthStralia.Storage.User, as: User
     alias Settings, as: S
 
     #TODO: Extract all token operations in separate module
@@ -10,7 +11,7 @@ defmodule AuthStralia.API.V1 do
       uid = req.post_arg("user_id")
       session_id = generate_uuid()
 
-      if (!check_credentials(uid,req.post_arg("password"))) do
+      if (!User.check_password(uid,req.post_arg("password"))) do
         {401, [], "Authorization failed"}
       else
         data = { sub: uid,
@@ -62,12 +63,6 @@ defmodule AuthStralia.API.V1 do
 ###################################################################################################
 ## PRIVATE
 ###################################################################################################
-
-    #TODO: Here goes our database stuff
-    defp check_credentials(user_id, password) do
-      ("alice@example.com" == user_id) and ("Correct password" == password)
-    end
-
     defp get_token_field(token, name) do
       {parsed_token} = :ejwt.parse_jwt(token, S.jwt_secret)
       :proplists.get_value(name, parsed_token)
