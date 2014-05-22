@@ -3,9 +3,13 @@ defmodule AuthStralia.Storage.User do
   alias AuthStralia.Storage.DB, as: DB
 
   queryable "users", primary_key: { :user_id, :string, [] } do
-    #TODO Validations and defaults
+    #TODO Validations
     field :salt
     field :password_hash
+  end
+
+  def create(user_id, password \\ nil) do
+    DB.insert new(user_id: user_id, salt: generate_salt)
   end
 
   def find_by_uid(uid) do
@@ -26,4 +30,5 @@ defmodule AuthStralia.Storage.User do
     {:ok, raw} = :pbkdf2.pbkdf2(:sha, password, salt, 4096, 32)
     :pbkdf2.to_hex(raw)
   end
+  defp generate_salt, do: :crypto.rand_bytes(16) |> :base64.encode_to_string |> to_string
 end
