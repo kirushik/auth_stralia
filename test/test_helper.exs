@@ -5,6 +5,8 @@ defmodule TokenOperations do
   # May be yet another module for this?
   def correct_id, do: "alice@example.com"
   def correct_password, do: "CorrectPassword"
+  def tag1, do: "qqq"
+  def tag2, do: "Zu Zu Zu"
 
   # Can be better. Borrowed from EJWT code itself
   def epoch do

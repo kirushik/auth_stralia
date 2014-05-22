@@ -3,12 +3,15 @@ defmodule StorageTest do
 
   alias AuthStralia.Storage.DB, as: DB
   alias AuthStralia.Storage.User, as: User
+  alias AuthStralia.Storage.Tag, as: Tag
 
   defp user_id, do: "bob@example.com"
   defp password, do: "qwerty123"
 
   setup do
+    DB.delete_all AuthStralia.Storage.TagToUserMapping
     DB.delete_all User
+    DB.delete_all Tag
     :ok
   end
 
@@ -48,6 +51,60 @@ defmodule StorageTest do
       User.create(user_id, password)
       User.check_password(user_id, "qweqweqwe") |> falsey
       User.check_password(user_id, password) |> truthy
+    end
+  end
+
+  describe "Tags model" do
+    it "is an array on User model" do
+      User.create(user_id, password, [])
+      u = User.find_by_uid(user_id)
+      User.tags(u) |> []
+    end
+
+    it "can be created" do
+      Tag.create("aaa")
+    end
+
+    it "can be listed" do
+      Tag.create("bbb")
+      Tag.create("ccc")
+
+      tags = DB.all Tag
+      length(tags) |> 2
+    end
+
+    it "stores only unique tags" do
+      Tag.create("aaa")
+      try do
+        Tag.create("aaa")
+      rescue
+        Postgrex.Error -> :gotcha
+      end |> :gotcha
+    end
+  end
+
+  describe "Tags and Users relations" do
+    it "stores tag for user" do
+      tag = Tag.create("aaa")
+      User.create(user_id, password, [tag])
+      u = User.find_by_uid(user_id)
+      User.tags(u) |> ["aaa"]
+    end
+
+    it "stores multiple tags for user" do
+      tag1 = Tag.create("aaa")
+      tag2 = Tag.create("bbb")
+      User.create(user_id, password, [tag1, tag2])
+      u = User.find_by_uid(user_id)
+      User.tags(u) |> ["aaa", "bbb"]
+    end
+
+    it "loads tags by uid" do
+      tag1 = Tag.create("aaa")
+      tag2 = Tag.create("bbb")
+      User.create(user_id, password, [tag1, tag2])
+
+      User.tags(user_id) |> ["aaa", "bbb"]
     end
   end
 end

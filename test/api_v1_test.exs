@@ -6,8 +6,12 @@ defmodule ApiV1Test do
   defp get_new_token, do: post('/login', %{:user_id => correct_id, :password => correct_password })
 
   setup_all do
+    AuthStralia.Storage.DB.delete_all AuthStralia.Storage.TagToUserMapping
     AuthStralia.Storage.DB.delete_all AuthStralia.Storage.User
-    AuthStralia.Storage.User.create(correct_id, correct_password)
+    AuthStralia.Storage.DB.delete_all AuthStralia.Storage.Tag
+    tag1_entity = AuthStralia.Storage.Tag.create(tag1)
+    tag2_entity = AuthStralia.Storage.Tag.create(tag2)
+    AuthStralia.Storage.User.create(correct_id, correct_password, [tag1_entity, tag2_entity])
     :ok
   end
 
@@ -21,6 +25,12 @@ defmodule ApiV1Test do
   
     it "returns 401 when incorrect password" do
       post_http_code('/login', %{:user_id => correct_id, :password => "Incorrect password"}) |> 401
+    end
+
+    it "returns token with tags" do
+      response = post('/login', %{:user_id => correct_id, :password => correct_password })
+      tags = Token.extract(response, "tags")
+      [tag1, tag2] |> tags
     end
   end
 
