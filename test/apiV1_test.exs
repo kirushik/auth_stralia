@@ -1,4 +1,4 @@
-defmodule AuthStraliaTest do
+defmodule ApiV1Test do
   use Amrita.Sweet
   use Localhost
 
