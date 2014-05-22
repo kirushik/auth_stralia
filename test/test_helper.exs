@@ -1,5 +1,23 @@
 Amrita.start
 
+defmodule TokenOperations do
+  alias Settings, as: S
+  # May be yet another module for this?
+  def correct_id, do: "alice@example.com"
+  def correct_password, do: "CorrectPassword"
+
+  # Can be better. Borrowed from EJWT code itself
+  def epoch do
+    :calendar.datetime_to_gregorian_seconds(:calendar.now_to_universal_time(:os.timestamp())) - 719528 * 24 * 3600
+  end
+  def generate_token(contents \\ { sub: correct_id,
+                                    iss: "auth.example.com",
+                                    jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" },
+                      timeout \\ 86400) do
+    :ejwt.jwt("HS256", contents, timeout, S.jwt_secret)
+  end
+end
+
 defmodule Localhost do
   alias Settings, as: S
 

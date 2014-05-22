@@ -1,24 +1,9 @@
 defmodule ApiV1Test do
   use Amrita.Sweet
   use Localhost
+  import TokenOperations
 
-  defp correct_id, do: "alice@example.com"
-  defp correct_password, do: "CorrectPassword"
   defp get_new_token, do: post('/login', %{:user_id => correct_id, :password => correct_password })
-
-  alias Settings, as: S
-
-  # Can be better. Borrowed from EJWT code itself
-  defp epoch do
-    :calendar.datetime_to_gregorian_seconds(:calendar.now_to_universal_time(:os.timestamp())) - 719528 * 24 * 3600
-  end
-
-  defp generate_token(contents \\ { sub: correct_id,
-                                    iss: "auth.example.com",
-                                    jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" },
-                      timeout \\ 86400) do
-    :ejwt.jwt("HS256", contents, timeout, S.jwt_secret)
-  end
 
   setup_all do
     AuthStralia.Storage.DB.delete_all AuthStralia.Storage.User
@@ -26,29 +11,12 @@ defmodule ApiV1Test do
     :ok
   end
 
-  defp set_expiration_time(token, new_timeout) do
-    {parsed_token} = :ejwt.parse_jwt(token, S.jwt_secret)
-    contents = :lists.map(
-      fn({a,b})->
-        {binary_to_atom(a),b }; 
-      end, parsed_token)
-    contents = {:proplists.delete(:exp, contents)}
-    generate_token(contents, new_timeout)
-  end
-  defp get_expiration_time(token) do
-    {parsed_token} = :ejwt.parse_jwt(token, S.jwt_secret)
-    :proplists.get_value("exp", parsed_token) - epoch()
-  end
-
-  defp extract_jti_from_token(token) do
-    {parsed_token} = :ejwt.parse_jwt(token, S.jwt_secret)
-    :proplists.get_value("jti", parsed_token)
-  end
-
   describe "/login" do
     it "returns correct JSON web token" do
       response = post('/login', %{:user_id => correct_id, :password => correct_password })
-      {_claims} = :ejwt.parse_jwt(response, S.jwt_secret)
+      parsed = Token.parse(response)
+      parsed |> ! :invalid
+      is_list(parsed) |> truthy
     end
   
     it "returns 401 when incorrect password" do
@@ -103,7 +71,7 @@ defmodule ApiV1Test do
     it "invalidates other tokes by 'jti' value" do
       token1 = get_new_token
       token2 = post('/login', %{:user_id => correct_id, :password => correct_password })
-      jti = extract_jti_from_token(token2)
+      jti = Token.extract(token2, "jti")
 
       get('/verify_token?token=#{token2}') |> "1"
       post('/session/invalidate', %{:jti => jti}, [{'bearer', token1}]) |> "1"
@@ -149,8 +117,8 @@ defmodule ApiV1Test do
 
       {:ok, sessions} = JSON.decode get('/session/list', [{'bearer', token1}])
       length(sessions) |> 2
-      sessions |> contains extract_jti_from_token(token1)
-      sessions |> contains extract_jti_from_token(token2)
+      sessions |> contains Token.extract(token1, "jti")
+      sessions |> contains Token.extract(token2, "jti")
     end
   end
 
@@ -161,9 +129,9 @@ defmodule ApiV1Test do
 
     it "updates token expiration time" do
       token = get_new_token
-      token = set_expiration_time(token, 3)
+      token = Token.update_expiration_time(token, 3)
       new_token = post('/session/update', %{}, [{'bearer', token}])
-      (get_expiration_time(new_token) > 3) |> truthy # Not the best way, certainly
+      (Token.extract(new_token, "exp") > 3) |> truthy # Not the best way, certainly
     end
   end
 end
