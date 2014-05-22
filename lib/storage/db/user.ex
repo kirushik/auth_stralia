@@ -1,6 +1,7 @@
 defmodule AuthStralia.Storage.User do
   use Ecto.Model
   alias AuthStralia.Storage.DB, as: DB
+  alias AuthStralia.Storage.TagToUserMapping, as: TTUM
 
   queryable "users", primary_key: { :user_id, :string, [] } do
     #TODO Validations
@@ -13,7 +14,12 @@ defmodule AuthStralia.Storage.User do
   def create(user_id, password \\ "", tags \\ []) do
     salt = generate_salt
     hash = hash_password(password, salt)
-    DB.insert new(user_id: user_id, salt: salt, password_hash: hash)
+    user = DB.insert new(user_id: user_id, salt: salt, password_hash: hash)
+    Enum.map(tags,
+      fn(tag) ->
+        DB.insert TTUM.new(tag_id: tag.title, user_id: user_id)
+      end)
+    user
   end
 
   def find_by_uid(uid) do

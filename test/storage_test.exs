@@ -82,4 +82,21 @@ defmodule StorageTest do
       end |> :gotcha
     end
   end
+
+  describe "Tags and Users relations" do
+    it "stores tag for user" do
+      tag = Tag.create("aaa")
+      User.create(user_id, password, [tag])
+      u = User.find_by_uid(user_id)
+      User.tags(u) |> [tag]
+    end
+
+    it "stores multiple tags for user" do
+      tag1 = Tag.create("aaa")
+      tag2 = Tag.create("bbb")
+      User.create(user_id, password, [tag1, tag2])
+      u = User.find_by_uid(user_id)
+      User.tags(u) |> [tag1, tag2]
+    end
+  end
 end
