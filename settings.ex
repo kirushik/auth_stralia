@@ -10,7 +10,7 @@ defmodule Config do
   def  get(:test) do
     [
       listen_on: 3000,
-      db_url: "ecto://auth_stralia:superpassword@localhost/auth_stralia_test",
+      db_url: "ecto://auth_stralia:superpassword@localhost/auth_stralia_test?size=1&max_overflow=0",
       jwt_secret: "secret",
       expires_in: 10 # seconds
     ]

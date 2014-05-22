@@ -31,7 +31,8 @@ defmodule AuthStralia.Mixfile do
       {:uuid, github: "avtobiff/erlang-uuid", tag: "v0.4.6"},
       {:json, github: "cblage/elixir-json"},
       {:postgrex, github: "ericmj/postgrex", tag: "v0.5.0", override: true},
-      {:ecto, "0.1.0"}
+      {:ecto, "0.1.0"},
+      {:pbkdf2, github: "basho/erlang-pbkdf2", tag: "2.0.0"}
     ]
   end
 end

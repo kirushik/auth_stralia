@@ -11,6 +11,7 @@
   "jiffy": {:git, "git://github.com/davisp/jiffy", "d16a4fd968e000b65e4678cccfad68d7a0a8bd1c", [tag: "d16a4fd968e000b65e4678cccfad68d7a0a8bd1c"]},
   "json": {:git, "git://github.com/cblage/elixir-json.git", "a50642c957a017fdcff4b06337b211f85bc8f653", []},
   "meck": {:git, "git://github.com/eproxus/meck.git", "2eb19524a0cf33a0fc67fed766679c93d363ceee", [branch: "master"]},
+  "pbkdf2": {:git, "git://github.com/basho/erlang-pbkdf2.git", "7076584f5377e98600a7e2cb81980b2992fb2f71", [tag: "2.0.0"]},
   "poolboy": {:package, "1.2.1"},
   "postgrex": {:git, "git://github.com/ericmj/postgrex.git", "53abc216696190c767d7c3f8171fb553a8924e0b", [tag: "v0.5.0"]},
   "uuid": {:git, "git://github.com/avtobiff/erlang-uuid.git", "7c8a3bb79d8a0a3092ffa75332a91958d5438c39", [tag: "v0.4.6"]}}
