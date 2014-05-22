@@ -98,5 +98,13 @@ defmodule StorageTest do
       u = User.find_by_uid(user_id)
       User.tags(u) |> ["aaa", "bbb"]
     end
+
+    it "loads tags by uid" do
+      tag1 = Tag.create("aaa")
+      tag2 = Tag.create("bbb")
+      User.create(user_id, password, [tag1, tag2])
+
+      User.tags(user_id) |> ["aaa", "bbb"]
+    end
   end
 end

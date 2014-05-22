@@ -16,7 +16,8 @@ defmodule AuthStralia.API.V1 do
         data = { sub: uid,
         #TODO We should introduce hostname setting here
                  iss: "auth.example.com",
-                 jti: session_id }
+                 jti: session_id,
+                 tags: User.tags(uid) }
 
         Session.new(uid, session_id)
 
