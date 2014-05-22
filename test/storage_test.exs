@@ -5,6 +5,7 @@ defmodule StorageTest do
   alias AuthStralia.Storage.User, as: User
 
   defp user_id, do: "bob@example.com"
+  defp password, do: "qwerty123"
 
   setup do
     DB.delete_all User
@@ -37,9 +38,16 @@ defmodule StorageTest do
     end
 
     it "saves password as a hash" do
+      User.create(user_id, password)
+      u = User.find_by_uid(user_id)
+      u.password_hash |> truthy
+      u.password_hash |> ! password
     end
 
     it "can check the password" do
+      User.create(user_id, password)
+      User.check_password(user_id, "qweqweqwe") |> falsey
+      User.check_password(user_id, password) |> truthy
     end
   end
 end

@@ -8,8 +8,11 @@ defmodule AuthStralia.Storage.User do
     field :password_hash
   end
 
-  def create(user_id, password \\ nil) do
-    DB.insert new(user_id: user_id, salt: generate_salt)
+  #TODO We could do better than defaulting to empty passwords
+  def create(user_id, password \\ "") do
+    salt = generate_salt
+    hash = hash_password(password, salt)
+    DB.insert new(user_id: user_id, salt: salt, password_hash: hash)
   end
 
   def find_by_uid(uid) do
