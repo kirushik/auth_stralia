@@ -1,24 +1,12 @@
 defmodule ApiV1Test do
   use Amrita.Sweet
   use Localhost
+  import TokenOperations
 
-  defp correct_id, do: "alice@example.com"
-  defp correct_password, do: "CorrectPassword"
   defp get_new_token, do: post('/login', %{:user_id => correct_id, :password => correct_password })
 
+  #TODO Remove all dependencies, moving all :ejwt into Token module usage
   alias Settings, as: S
-
-  # Can be better. Borrowed from EJWT code itself
-  defp epoch do
-    :calendar.datetime_to_gregorian_seconds(:calendar.now_to_universal_time(:os.timestamp())) - 719528 * 24 * 3600
-  end
-
-  defp generate_token(contents \\ { sub: correct_id,
-                                    iss: "auth.example.com",
-                                    jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" },
-                      timeout \\ 86400) do
-    :ejwt.jwt("HS256", contents, timeout, S.jwt_secret)
-  end
 
   setup_all do
     AuthStralia.Storage.DB.delete_all AuthStralia.Storage.User

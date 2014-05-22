@@ -16,7 +16,7 @@ defmodule AuthStralia.Supervisor do
       callback: :elli_middleware, 
       callback_args: [
         mods: [
-          {AuthStralia.API.V1.TokenValidator, [prefix: "/api/V1/session"]}, 
+          {AuthStralia.API.V1.ProtectByBearer, [prefix: "/api/V1/session"]}, 
           {AuthStralia.API.V1.Handler, [prefix: "/api/V1/"]}
         ]
       ], 
