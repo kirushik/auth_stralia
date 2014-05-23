@@ -7,7 +7,7 @@ defmodule Config do
       expires_in: 600 # 10 minutes
     ]
   end
-  def  get(:test) do
+  def get(:test) do
     [
       listen_on: 3000,
       db_url: "ecto://auth_stralia:superpassword@localhost/auth_stralia_test?size=1&max_overflow=0",
@@ -16,6 +16,14 @@ defmodule Config do
     ]
   end
   #TODO introduce :prod configuration, with ENV vars usage
+  def get(:prod) do
+    [
+      listen_on: System.get_env("PORT") |> binary_to_integer,
+      db_url: System.get_env("DATABASE_URL"),
+      jwt_secret: System.get_env("JWT_SECRET"),
+      expires_in: (7*24*60*60) # 1 week
+    ]
+  end
 end
 
 defmodule Settings do

@@ -10,6 +10,8 @@ defmodule AuthStralia.API.V1 do
       uid = req.post_arg("user_id")
       session_id = UUID.generate
 
+      # IO.inspect req
+      
       if (!User.check_password(uid,req.post_arg("password"))) do
         {401, [], "Authorization failed"}
       else
