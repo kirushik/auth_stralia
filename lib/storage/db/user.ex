@@ -40,7 +40,7 @@ defmodule AuthStralia.Storage.User do
     DB.all(from ttum in TTUM, where: ttum.user_id==^user_id) |> Enum.map &(&1.tag_id)
   end
   def tags(user) do
-    user.tag_to_user_mappings.to_list |> Enum.map &(&1.tag_id)
+    user.tag_to_user_mappings.all |> Enum.map &(&1.tag_id)
   end
 
   defp hash_password(password, salt) do
