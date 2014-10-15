@@ -3,7 +3,7 @@ defmodule AuthStralia.Storage.User do
   alias AuthStralia.Storage.DB, as: DB
   alias AuthStralia.Storage.TagToUserMapping, as: TTUM
 
-  schema "user", primary_key: { :user_id, :string, [] } do
+  schema "users", primary_key: { :user_id, :string, [] } do
     #TODO Validations
     field :salt
     field :password_hash

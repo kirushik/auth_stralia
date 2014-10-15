@@ -3,7 +3,7 @@ defmodule AuthStralia.Storage do
     use Ecto.Model
     alias AuthStralia.Storage.DB, as: DB
 
-    schema "tag", primary_key: {:title, :string, []} do
+    schema "tags", primary_key: {:title, :string, []} do
       has_many :tag_to_user_mappings, TagToUserMapping, [foreign_key: :tag_id]
     end
 
@@ -15,7 +15,7 @@ defmodule AuthStralia.Storage do
   defmodule TagToUserMapping do
     use Ecto.Model
 
-    schema "tag_to_user_mapping", primary_key: false do
+    schema "tag_to_user_mappings", primary_key: false do
       belongs_to :tag, Tag, [references: :title, type: :string]
       belongs_to :user, User, [references: :user_id, type: :string]
     end
