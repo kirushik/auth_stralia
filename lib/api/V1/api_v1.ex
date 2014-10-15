@@ -15,11 +15,11 @@ defmodule AuthStralia.API.V1 do
       if (!User.check_password(uid,req.post_arg("password"))) do
         {401, [], "Authorization failed"}
       else
-        data = { sub: uid,
+        data = [ sub: uid,
         #TODO We should introduce hostname setting here
                  iss: "auth.example.com",
                  jti: session_id,
-                 tags: User.tags(uid) }
+                 tags: User.tags(uid) ]
 
         Session.new(uid, session_id)
 

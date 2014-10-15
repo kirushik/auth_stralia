@@ -3,7 +3,7 @@ defmodule AuthStralia.Storage.User do
   alias AuthStralia.Storage.DB, as: DB
   alias AuthStralia.Storage.TagToUserMapping, as: TTUM
 
-  queryable "users", primary_key: { :user_id, :string, [] } do
+  schema "user", primary_key: { :user_id, :string, [] } do
     #TODO Validations
     field :salt
     field :password_hash
@@ -14,10 +14,10 @@ defmodule AuthStralia.Storage.User do
   def create(user_id, password \\ "", tags \\ []) do
     salt = generate_salt
     hash = hash_password(password, salt)
-    user = DB.insert new(user_id: user_id, salt: salt, password_hash: hash)
+    user = DB.insert %AuthStralia.Storage.User{user_id: user_id, salt: salt, password_hash: hash}
     Enum.map(tags,
       fn(tag) ->
-        DB.insert TTUM.new(tag_id: tag.title, user_id: user_id)
+        DB.insert %TTUM{tag_id: tag.title, user_id: user_id}
       end)
     user
   end

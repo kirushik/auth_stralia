@@ -1,5 +1,5 @@
 defmodule AuthStralia do
-  use Application.Behaviour
+  use Application
 
   def start(_type, _args) do
     { :ok, _pid } = AuthStralia.Supervisor.start_link([])  
@@ -7,7 +7,7 @@ defmodule AuthStralia do
 end
 
 defmodule AuthStralia.Supervisor do
-  use Supervisor.Behaviour
+  use Supervisor
 
   alias Settings, as: S
 

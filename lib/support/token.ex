@@ -23,7 +23,7 @@ defmodule Token do
   def update_expiration_time(token, new_timeout \\ S.expiresIn) do
     contents = :lists.map(
       fn({a,b})->
-        {binary_to_atom(a),b }; 
+        {String.to_atom(a),b }; 
       end, parse(token))
     contents = {:proplists.delete(:exp, contents)}
     compose(contents, new_timeout)
