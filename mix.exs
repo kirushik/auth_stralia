@@ -14,7 +14,7 @@ defmodule AuthStralia.Mixfile do
 
   def application do
     [
-      applications: [:inets, :crypto, :exredis, :postgrex, :ecto],
+      applications: [:logger, :crypto, :exredis, :postgrex, :ecto, :cowboy, :plug],
       registered: [:auth_stralia],
       mod: {AuthStralia, []},
 
@@ -24,7 +24,8 @@ defmodule AuthStralia.Mixfile do
 
   defp deps do
     [
-      {:elli_http_handler, github: "kirushik/ellihandler"},
+      {:plug, "~> 0.8.1"},
+      {:cowboy, "~> 1.0.0"},
       {:ejwt, github: "kato-im/ejwt"},
       {:amrita, github: "josephwilk/amrita"},
       {:exredis, github: "artemeff/exredis"},

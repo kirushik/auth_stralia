@@ -15,7 +15,6 @@ defmodule Config do
       expires_in: 10 # seconds
     ]
   end
-  #TODO introduce :prod configuration, with ENV vars usage
   def get(:prod) do
     [
       listen_on: System.get_env("PORT") |> String.to_integer,
