@@ -113,7 +113,7 @@ defmodule ApiV1Test do
 
   describe "/session/list" do
     it "fails without proper token" do
-      post_http_code('/session/list') |> 401
+      get_http_code('/session/list') |> 401
     end
 
     it "lists all sessions" do

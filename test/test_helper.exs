@@ -33,8 +33,8 @@ defmodule Localhost do
         List.to_string response
       end
 
-      def get_http_code(relative_path) do
-        {:ok, {{_,code,_},_,_}} = Localhost.make_get_request(relative_path, unquote(api_version))
+      def get_http_code(relative_path, headers \\ []) do
+        {:ok, {{_,code,_},_,_}} = Localhost.make_get_request(relative_path, unquote(api_version), headers)
         code
       end
 
@@ -84,7 +84,7 @@ defmodule Localhost do
   defp prepare_headers(headers) do
     Enum.map(headers,
       fn({a,b}) ->
-        {a, String.to_char_list(b)}
+        {a, to_char_list(b)}
       end)
   end
 end

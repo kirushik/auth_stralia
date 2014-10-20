@@ -29,7 +29,7 @@ defmodule AuthStralia.API.V1.SessionController do
     end
   end
 
-    post "/invalidate/all" do
+    post "invalidate/all" do
       case get_req_header(conn, "bearer") do
       [token] ->
         sub = Token.extract(token, "sub")
@@ -39,11 +39,15 @@ defmodule AuthStralia.API.V1.SessionController do
       end
     end
 
-#     get "/session/list" do
-#       token = req.get_header("Bearer")
-#       sub = Token.extract(token, "sub")
-#       http_ok JSON.encode!(Session.list(sub))
-#     end
+    get "list" do
+      case get_req_header(conn, "bearer") do
+      [token] ->
+        sub = Token.extract(token, "sub")
+        http_ok(conn, JSON.encode!(Session.list(sub)))
+      [] ->
+        send_401 conn
+      end
+    end
 
 #     post "/session/update" do
 #       token = req.get_header("Bearer")
