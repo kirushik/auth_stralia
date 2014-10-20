@@ -1,3 +1,4 @@
+ExUnit.start
 Amrita.start
 
 defmodule TokenOperations do
@@ -12,9 +13,9 @@ defmodule TokenOperations do
   def epoch do
     :calendar.datetime_to_gregorian_seconds(:calendar.now_to_universal_time(:os.timestamp())) - 719528 * 24 * 3600
   end
-  def generate_token(contents \\ { sub: correct_id,
+  def generate_token(contents \\ {[ sub: correct_id,
                                     iss: "auth.example.com",
-                                    jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" },
+                                    jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" ]},
                       timeout \\ 86400) do
     :ejwt.jwt("HS256", contents, timeout, S.jwt_secret)
   end
@@ -29,18 +30,18 @@ defmodule Localhost do
     quote bind_quoted: [api_version: api_version] do
       def get(relative_path, headers \\ []) do
         {:ok, {{_,200,_},_,response}} = Localhost.make_get_request(relative_path, unquote(api_version), headers)
-        list_to_bitstring response
+        List.to_string response
       end
 
-      def get_http_code(relative_path) do
-        {:ok, {{_,code,_},_,_}} = Localhost.make_get_request(relative_path, unquote(api_version))
+      def get_http_code(relative_path, headers \\ []) do
+        {:ok, {{_,code,_},_,_}} = Localhost.make_get_request(relative_path, unquote(api_version), headers)
         code
       end
 
       def post(relative_path, params \\ %{}, headers \\ []) do
         params = Localhost.params_to_string(params)
         {:ok, {{_,200,_},_,response}} = Localhost.make_post_request(relative_path, unquote(api_version), headers, params)
-        list_to_bitstring response
+        List.to_string response
       end
 
       def post_http_code(relative_path, params \\ %{}, headers \\ []) do
@@ -59,10 +60,10 @@ defmodule Localhost do
   def make_post_request(relative_path, api_version, headers, params) do
     headers = prepare_headers headers
     :httpc.request(
-      :post, 
-      { 
+      :post,
+      {
         'http://localhost:#{S.port}/api/#{api_version}#{relative_path}',
-        headers, 
+        headers,
         'application/x-www-form-urlencoded',
         params
       },
@@ -73,7 +74,7 @@ defmodule Localhost do
     headers = prepare_headers headers
     :httpc.request(
       :get,
-      { 
+      {
         'http://localhost:#{S.port}/api/#{api_version}#{relative_path}',
         headers
       },
@@ -81,10 +82,9 @@ defmodule Localhost do
   end
 
   defp prepare_headers(headers) do
-    :lists.map(
-      fn({a,b}) -> 
-        {:ok, b} = List.from_char_data(b);
-        {a,b};
-      end, headers)  
-  end  
+    Enum.map(headers,
+      fn({a,b}) ->
+        {a, to_char_list(b)}
+      end)
+  end
 end

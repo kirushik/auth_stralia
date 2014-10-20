@@ -17,10 +17,11 @@ defmodule StorageTest do
 
   describe "User model" do
     it "can be saved and restored" do
-      DB.insert User.new(user_id: user_id)
+      DB.insert %User{user_id: user_id}
 
       u = User.find_by_uid(user_id)
-      user_id |> u.user_id # Because fails when function is on the right side
+      # u1 = user_id()
+      u.user_id |> equals user_id
     end
 
     it "fails to overwrite user with same uid" do
@@ -96,15 +97,14 @@ defmodule StorageTest do
       tag2 = Tag.create("bbb")
       User.create(user_id, password, [tag1, tag2])
       u = User.find_by_uid(user_id)
-      User.tags(u) |> ["aaa", "bbb"]
+      User.tags(u) |> Enum.sort |> ["aaa", "bbb"]
     end
 
     it "loads tags by uid" do
       tag1 = Tag.create("aaa")
       tag2 = Tag.create("bbb")
       User.create(user_id, password, [tag1, tag2])
-
-      User.tags(user_id) |> ["aaa", "bbb"]
+      User.tags(user_id) |> Enum.sort |> ["aaa", "bbb"]
     end
   end
 end

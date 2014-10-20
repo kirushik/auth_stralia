@@ -3,7 +3,7 @@ defmodule AuthStralia.Storage.User do
   alias AuthStralia.Storage.DB, as: DB
   alias AuthStralia.Storage.TagToUserMapping, as: TTUM
 
-  queryable "users", primary_key: { :user_id, :string, [] } do
+  schema "users", primary_key: { :user_id, :string, [] } do
     #TODO Validations
     field :salt
     field :password_hash
@@ -14,10 +14,10 @@ defmodule AuthStralia.Storage.User do
   def create(user_id, password \\ "", tags \\ []) do
     salt = generate_salt
     hash = hash_password(password, salt)
-    user = DB.insert new(user_id: user_id, salt: salt, password_hash: hash)
+    user = DB.insert %AuthStralia.Storage.User{user_id: user_id, salt: salt, password_hash: hash}
     Enum.map(tags,
       fn(tag) ->
-        DB.insert TTUM.new(tag_id: tag.title, user_id: user_id)
+        DB.insert %TTUM{tag_id: tag.title, user_id: user_id}
       end)
     user
   end
@@ -29,18 +29,18 @@ defmodule AuthStralia.Storage.User do
       [] -> nil
     end
   end
-  
+
   def check_password(user_id, password) do
     user = find_by_uid(user_id)
     #TODO Crypto string comparison
-    user.password_hash == hash_password(password, user.salt)
+    user != nil and user.password_hash == hash_password(password, user.salt)
   end
 
   def tags(user_id) when is_bitstring(user_id) do
     DB.all(from ttum in TTUM, where: ttum.user_id==^user_id) |> Enum.map &(&1.tag_id)
   end
   def tags(user) do
-    user.tag_to_user_mappings.to_list |> Enum.map &(&1.tag_id)
+    user.tag_to_user_mappings.all |> Enum.map &(&1.tag_id)
   end
 
   defp hash_password(password, salt) do

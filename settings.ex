@@ -15,10 +15,9 @@ defmodule Config do
       expires_in: 10 # seconds
     ]
   end
-  #TODO introduce :prod configuration, with ENV vars usage
   def get(:prod) do
     [
-      listen_on: System.get_env("PORT") |> binary_to_integer,
+      listen_on: System.get_env("PORT") |> String.to_integer,
       db_url: System.get_env("DATABASE_URL"),
       jwt_secret: System.get_env("JWT_SECRET"),
       expires_in: (7*24*60*60) # 1 week
