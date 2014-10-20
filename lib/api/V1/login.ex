@@ -15,14 +15,13 @@ defmodule AuthStralia.API.V1.LoginController do
 
   post "/" do
     conn = conn |> fetch_params
-
     %{"user_id" => user_id, "password" => password} = conn.params
 
-    session_id = UUID.generate
 
     if (!User.check_password(user_id,password)) do
       send_401 conn
     else
+      session_id = UUID.generate
       data = [ sub: user_id,
       #TODO We should introduce hostname setting here
                iss: "auth.example.com",
