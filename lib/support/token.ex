@@ -21,11 +21,12 @@ defmodule Token do
   end
 
   def update_expiration_time(token, new_timeout \\ S.expiresIn) do
-    contents = :lists.map(
+    contents = Enum.map(
+      parse(token),
       fn({a,b})->
         {String.to_atom(a),b };
-      end, parse(token))
-    contents = {:proplists.delete(:exp, contents)}
+      end)
+    contents = Dict.delete(contents, :exp)
     compose(contents, new_timeout)
   end
 end

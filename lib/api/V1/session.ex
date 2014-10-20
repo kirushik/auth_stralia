@@ -49,10 +49,14 @@ defmodule AuthStralia.API.V1.SessionController do
       end
     end
 
-#     post "/session/update" do
-#       token = req.get_header("Bearer")
-#       http_ok Token.update_expiration_time(token)
-#     end
+    post "update" do
+      case get_req_header(conn, "bearer") do
+      [token] ->
+        http_ok(conn, Token.update_expiration_time(token))
+      [] ->
+        send_401 conn
+      end
+    end
 
   defp http_ok(conn, data)do
     send_resp(conn, 200, data)
