@@ -17,7 +17,7 @@ defmodule TokenOperations do
                                     iss: "auth.example.com",
                                     jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" ],
                       timeout \\ 86400) do
-    :ejwt.jwt("HS256", contents, timeout, S.jwt_secret)
+    :ejwt.jwt("HS256", {contents}, timeout, S.jwt_secret)
   end
 end
 
