@@ -1,8 +1,7 @@
-defmodule AuthStralia.API.V1.VerifyToken do
+defmodule AuthStralia.API.V1.VerifyTokenController do
   use Plug.Router
 
   alias AuthStralia.Redis.Session, as: Session
-  alias AuthStralia.Storage.User,  as: User
 
   import Plug.Conn
 

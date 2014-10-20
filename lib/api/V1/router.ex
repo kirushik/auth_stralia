@@ -4,6 +4,7 @@ defmodule AuthStralia.API.V1.Router do
   plug :match
   plug :dispatch
 
-  forward "login", to: AuthStralia.API.V1.Login
-  forward "verify_token", to: AuthStralia.API.V1.VerifyToken
+  forward "login", to: AuthStralia.API.V1.LoginController
+  forward "verify_token", to: AuthStralia.API.V1.VerifyTokenController
+  forward "session", to: AuthStralia.API.V1.SessionController
 end
