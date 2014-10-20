@@ -2,9 +2,10 @@ defmodule AuthStralia.API.V1.SessionController do
   use Plug.Router
 
   alias AuthStralia.Redis.Session, as: Session
-  alias AuthStralia.Storage.User,  as: User
+  # alias AuthStralia.Storage.User,  as: User
 
   import Plug.Conn
+  import AuthStralia.API.V1.Helpers
 
   plug Plug.Parsers, parsers: [:urlencoded]
 
@@ -57,12 +58,4 @@ defmodule AuthStralia.API.V1.SessionController do
         send_401 conn
       end
     end
-
-  defp http_ok(conn, data)do
-    send_resp(conn, 200, data)
-  end
-
-  defp send_401(conn) do
-    send_resp(conn, 401, "Unauthorized")
-  end
 end

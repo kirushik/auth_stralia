@@ -5,6 +5,7 @@ defmodule AuthStralia.API.V1.LoginController do
   alias AuthStralia.Storage.User,  as: User
 
   import Plug.Conn
+  import AuthStralia.API.V1.Helpers
 
   plug Plug.Parsers, parsers: [:urlencoded]
 
@@ -32,14 +33,5 @@ defmodule AuthStralia.API.V1.LoginController do
 
       jwt_ok conn, Token.compose(data)
     end
-  end
-
-  defp jwt_ok(conn, data) do
-    conn |> put_resp_content_type("application/jwt")|>
-    send_resp(200, data)
-  end
-
-  defp send_401 conn do
-    send_resp(conn, 401, "Authorization failed")
   end
 end

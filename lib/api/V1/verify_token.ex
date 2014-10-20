@@ -4,9 +4,11 @@ defmodule AuthStralia.API.V1.VerifyTokenController do
   alias AuthStralia.Redis.Session, as: Session
 
   import Plug.Conn
+  import AuthStralia.API.V1.Helpers
 
   plug :match
   plug :dispatch
+
 
   get "/" do
     conn = conn |> fetch_params
@@ -17,6 +19,6 @@ defmodule AuthStralia.API.V1.VerifyTokenController do
         Session.check(Token.get(parsed, "sub"), Token.get(parsed, "jti"))
       _ -> "0"
     end
-    send_resp(conn, 200, res)
+    http_ok(conn, res)
   end
 end
