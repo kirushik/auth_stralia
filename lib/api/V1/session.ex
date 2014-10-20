@@ -29,11 +29,15 @@ defmodule AuthStralia.API.V1.SessionController do
     end
   end
 
-#     post "/session/invalidate/all" do
-#       token = req.get_header("Bearer")
-#       sub = Token.extract(token, "sub")
-#       http_ok Session.remove_all(sub)
-#     end
+    post "/invalidate/all" do
+      case get_req_header(conn, "bearer") do
+      [token] ->
+        sub = Token.extract(token, "sub")
+        http_ok(conn, Session.remove_all(sub))
+      [] ->
+        send_401 conn
+      end
+    end
 
 #     get "/session/list" do
 #       token = req.get_header("Bearer")
