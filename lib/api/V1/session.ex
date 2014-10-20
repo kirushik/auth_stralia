@@ -6,11 +6,50 @@ defmodule AuthStralia.API.V1.SessionController do
 
   import Plug.Conn
 
+  plug Plug.Parsers, parsers: [:urlencoded]
+
   plug :match
   plug :dispatch
 
-  match _ do
-    send_resp(conn, 300, "QQQ")
+
+  post "invalidate" do
+    conn = conn |> fetch_params
+    case get_req_header(conn, "bearer") do
+    [token] ->
+      %{"jti" => jti} = conn.parameters
+
+      sub = Token.extract(token, "sub")
+      if jti==:undefined do
+        jti = Token.extract(token, "jti")
+      end
+      http_ok(conn, Session.remove(sub, jti))
+    [] ->
+      send_401 conn
+    end
   end
 
+#     post "/session/invalidate/all" do
+#       token = req.get_header("Bearer")
+#       sub = Token.extract(token, "sub")
+#       http_ok Session.remove_all(sub)
+#     end
+
+#     get "/session/list" do
+#       token = req.get_header("Bearer")
+#       sub = Token.extract(token, "sub")
+#       http_ok JSON.encode!(Session.list(sub))
+#     end
+
+#     post "/session/update" do
+#       token = req.get_header("Bearer")
+#       http_ok Token.update_expiration_time(token)
+#     end
+
+  defp http_ok(conn, data)do
+    send_resp(conn, 200, data)
+  end
+
+  defp send_401(conn) do
+    send_resp(conn, 401, "Unauthorized")
+  end
 end
