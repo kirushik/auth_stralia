@@ -16,12 +16,13 @@ defmodule AuthStralia.API.V1.SessionController do
     conn = conn |> fetch_params
     case get_req_header(conn, "bearer") do
     [token] ->
-      %{"jti" => jti} = conn.parameters
-
-      sub = Token.extract(token, "sub")
-      if jti==:undefined do
-        jti = Token.extract(token, "jti")
+      jti = if Dict.has_key?(conn.params, :jti) do
+        conn.params.jti
+      else
+        Token.extract(token, "jti")
       end
+      sub = Token.extract(token, "sub")
+
       http_ok(conn, Session.remove(sub, jti))
     [] ->
       send_401 conn

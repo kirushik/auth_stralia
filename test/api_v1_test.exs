@@ -22,7 +22,7 @@ defmodule ApiV1Test do
       parsed |> ! :invalid
       is_list(parsed) |> truthy
     end
-  
+
     it "returns 401 when incorrect password" do
       post_http_code('/login', %{:user_id => correct_id, :password => "Incorrect password"}) |> 401
     end
