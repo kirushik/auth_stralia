@@ -60,10 +60,10 @@ defmodule Localhost do
   def make_post_request(relative_path, api_version, headers, params) do
     headers = prepare_headers headers
     :httpc.request(
-      :post, 
-      { 
+      :post,
+      {
         'http://localhost:#{S.port}/api/#{api_version}#{relative_path}',
-        headers, 
+        headers,
         'application/x-www-form-urlencoded',
         params
       },
@@ -74,7 +74,7 @@ defmodule Localhost do
     headers = prepare_headers headers
     :httpc.request(
       :get,
-      { 
+      {
         'http://localhost:#{S.port}/api/#{api_version}#{relative_path}',
         headers
       },
@@ -83,9 +83,9 @@ defmodule Localhost do
 
   defp prepare_headers(headers) do
     :lists.map(
-      fn({a,b}) -> 
-        {:ok, b} = List.from_char_data(b);
+      fn({a,b}) ->
+        {:ok, b} = String.to_char_list(b);
         {a,b};
-      end, headers)  
-  end  
+      end, headers)
+  end
 end
