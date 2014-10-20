@@ -84,7 +84,7 @@ defmodule ApiV1Test do
       jti = Token.extract(token2, "jti")
 
       get('/verify_token?token=#{token2}') |> "1"
-      post('/session/invalidate', %{:jti => jti}, [{'bearer', token1}]) |> "1"
+      post('/session/invalidate', %{jti: jti}, [{'bearer', token2}]) |> "1"
       get('/verify_token?token=#{token1}') |> "1"
       get('/verify_token?token=#{token2}') |> "0"
     end
