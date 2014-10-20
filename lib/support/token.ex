@@ -9,7 +9,7 @@ defmodule Token do
   end
 
   def compose(contents, timeout \\ S.expiresIn) do
-    :ejwt.jwt("HS256",contents, timeout, S.jwt_secret)
+    :ejwt.jwt("HS256",{contents}, timeout, S.jwt_secret)
   end
 
   def extract(token, field) when is_bitstring(token) do
@@ -23,7 +23,7 @@ defmodule Token do
   def update_expiration_time(token, new_timeout \\ S.expiresIn) do
     contents = :lists.map(
       fn({a,b})->
-        {String.to_atom(a),b }; 
+        {String.to_atom(a),b };
       end, parse(token))
     contents = {:proplists.delete(:exp, contents)}
     compose(contents, new_timeout)
