@@ -82,10 +82,9 @@ defmodule Localhost do
   end
 
   defp prepare_headers(headers) do
-    :lists.map(
+    Enum.map(headers,
       fn({a,b}) ->
-        {:ok, b} = String.to_char_list(b);
-        {a,b};
-      end, headers)
+        {a, String.to_char_list(b)}
+      end)
   end
 end
