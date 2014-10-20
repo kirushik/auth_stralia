@@ -9,7 +9,7 @@
 #       session_id = UUID.generate
 
 #       # IO.inspect req
-      
+
 #       if (!User.check_password(uid,req.post_arg("password"))) do
 #         {401, [], "Authorization failed"}
 #       else
@@ -28,7 +28,7 @@
 #     get "/verify_token", with_params token do
 #       res = case Token.parse(token) do
 #         :invalid -> "0"
-#         parsed when is_list(parsed) -> 
+#         parsed when is_list(parsed) ->
 #           Session.check(Token.get(parsed, "sub"), Token.get(parsed, "jti"))
 #         _ -> "0"
 #       end
