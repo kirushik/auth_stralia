@@ -144,4 +144,10 @@ defmodule ApiV1Test do
       (Token.extract(new_token, "exp") > 3) |> truthy # Not the best way, certainly
     end
   end
+
+  describe "CORS" do
+    it "should be enabled" do
+      get_headers('/login') |> contains {'access-control-allow-origin', '*'}
+    end
+  end
 end

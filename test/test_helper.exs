@@ -38,6 +38,11 @@ defmodule Localhost do
         code
       end
 
+      def get_headers(relative_path, headers \\ []) do
+        {:ok, {{_,200,_},resp_headers,_}} =  Localhost.make_options_request(relative_path, unquote(api_version), headers)
+        resp_headers
+      end
+
       def post(relative_path, params \\ %{}, headers \\ []) do
         params = Localhost.params_to_string(params)
         {:ok, {{_,200,_},_,response}} = Localhost.make_post_request(relative_path, unquote(api_version), headers, params)
@@ -66,6 +71,17 @@ defmodule Localhost do
         headers,
         'application/x-www-form-urlencoded',
         params
+      },
+      [], [])
+  end
+
+  def make_options_request(relative_path, api_version, headers) do
+    headers = prepare_headers headers
+    :httpc.request(
+      :options,
+      {
+        'http://localhost:#{S.port}/api/#{api_version}#{relative_path}',
+        headers
       },
       [], [])
   end
