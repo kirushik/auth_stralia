@@ -10,7 +10,7 @@ defmodule AuthStralia.API.V1.Helpers do
   end
 
   def http_ok(conn, data, type \\ "text/plain")do
-    conn |> put_resp_content_type(type)|>
+    put_resp_content_type(conn, type) |>
     send_resp(200, data)
   end
 
