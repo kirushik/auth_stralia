@@ -22,9 +22,11 @@ defmodule AuthStralia.API.V1.Router do
 
   defp enable_cors(conn, _opts) do
     conn |>
-    put_resp_header("access-control-allow-origin", "*") |>
+    put_resp_header("access-control-allow-origin", "http://localhost:9000") |>
     put_resp_header("access-control-allow-methods", "GET, OPTIONS, POST") |>
-    put_resp_header("access-control-allow-headers", "AUTHORIZATION, CONTENT-TYPE")
+    put_resp_header("access-control-allow-credentials", "true") |>
+    put_resp_header("access-control-expose-headers", "authorization")|>
+    put_resp_header("access-control-allow-headers", "accept, authorization, content-type")
   end
 
   defp verify_token_presence(conn, %{paths: paths}) do
