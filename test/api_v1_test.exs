@@ -148,18 +148,18 @@ defmodule ApiV1Test do
   describe "CORS" do
     it "should be enabled for POST" do
       headers = post_headers('/login', %{:user_id => correct_id, :password => correct_password })
-      headers |> contains {'access-control-allow-origin', '*'}
+      headers |> contains {'access-control-allow-origin', 'http://localhost:9000'}
     end
     it "should be enabled for GET" do
       headers = fetch_headers(:get, '/verify_token?token=#{get_new_token}')
-      headers |> contains {'access-control-allow-origin', '*'}
+      headers |> contains {'access-control-allow-origin', 'http://localhost:9000'}
     end
     it "should be enabled for OPTIONS" do
       headers = fetch_headers(:options, '/login')
-      headers |> contains {'access-control-allow-origin', '*'}
+      headers |> contains {'access-control-allow-origin', 'http://localhost:9000'}
       # Not the best way, but should work
       Enum.find(headers, &(match?({'access-control-allow-methods', _}, &1))) |> equals {'access-control-allow-methods', 'GET, OPTIONS, POST'}
-      Enum.find(headers, &(match?({'access-control-allow-headers', _}, &1))) |> equals {'access-control-allow-headers', 'AUTHORIZATION, CONTENT-TYPE'}
+      Enum.find(headers, &(match?({'access-control-allow-headers', _}, &1))) |> equals {'access-control-allow-headers', 'accept, authorization, content-type, origin, x-requested-with'}
     end
   end
 end

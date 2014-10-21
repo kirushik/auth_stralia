@@ -26,7 +26,7 @@ defmodule AuthStralia.API.V1.Router do
     put_resp_header("access-control-allow-methods", "GET, OPTIONS, POST") |>
     put_resp_header("access-control-allow-credentials", "true") |>
     put_resp_header("access-control-expose-headers", "authorization")|>
-    put_resp_header("access-control-allow-headers", "accept, authorization, content-type")
+    put_resp_header("access-control-allow-headers", "accept, authorization, content-type, origin, x-requested-with")
   end
 
   defp verify_token_presence(conn, %{paths: paths}) do
