@@ -13,7 +13,10 @@ defmodule AuthStralia.API.V1.Router do
 
   # Enabling CORS on all the endpoints
   options _ do
-    put_resp_header(conn, "Access-Control-Allow-Origin", "*") |>
+    conn |>
+    put_resp_header("access-control-allow-origin", "*") |>
+    put_resp_header("access-control-allow-methods", "GET, OPTIONS, POST") |>
+    put_resp_header("access-control-allow-headers", "CONTENT-TYPE") |>
     http_ok ""
   end
 

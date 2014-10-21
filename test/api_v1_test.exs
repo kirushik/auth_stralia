@@ -147,7 +147,11 @@ defmodule ApiV1Test do
 
   describe "CORS" do
     it "should be enabled" do
-      get_headers('/login') |> contains {'access-control-allow-origin', '*'}
+      headers = get_headers('/login')
+      headers |> contains {'access-control-allow-origin', '*'}
+      # Not the best way, but should work
+      Enum.find(headers, &(match?({'access-control-allow-methods', _}, &1))) |> equals {'access-control-allow-methods', 'GET, OPTIONS, POST'}
+      Enum.find(headers, &(match?({'access-control-allow-headers', _}, &1))) |> equals {'access-control-allow-headers', 'CONTENT-TYPE'}
     end
   end
 end
