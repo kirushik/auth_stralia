@@ -1,9 +1,12 @@
 defmodule ApiV1Test do
   use Amrita.Sweet
   use Localhost
+
+  alias AuthStralia.Storage.User,  as: User
+
   import TokenOperations
 
-  defp get_new_token, do: post('/login', %{:user_id => correct_id, :password => correct_password })
+  defp get_new_token, do: post('/login', %{user_id: correct_id, password: correct_password })
 
   setup_all do
     AuthStralia.Storage.DB.delete_all AuthStralia.Storage.TagToUserMapping
@@ -11,24 +14,25 @@ defmodule ApiV1Test do
     AuthStralia.Storage.DB.delete_all AuthStralia.Storage.Tag
     tag1_entity = AuthStralia.Storage.Tag.create(tag1)
     tag2_entity = AuthStralia.Storage.Tag.create(tag2)
-    AuthStralia.Storage.User.create(correct_id, correct_password, [tag1_entity, tag2_entity])
+
+    User.create(correct_id, correct_password, [tag1_entity, tag2_entity])
     :ok
   end
 
   describe "/login" do
     it "returns correct JSON web token" do
-      response = post('/login', %{:user_id => correct_id, :password => correct_password })
+      response = post('/login', %{user_id: correct_id, password: correct_password })
       parsed = Token.parse(response)
       parsed |> ! :invalid
       is_list(parsed) |> truthy
     end
 
     it "returns 401 when incorrect password" do
-      post_http_code('/login', %{:user_id => correct_id, :password => "Incorrect password"}) |> 401
+      post_http_code('/login', %{user_id: correct_id, password: incorrect_password}) |> 401
     end
 
     it "returns token with tags" do
-      response = post('/login', %{:user_id => correct_id, :password => correct_password })
+      response = post('/login', %{user_id: correct_id, password: correct_password })
       tags = Token.extract(response, "tags")
       [tag1, tag2] |> tags
     end
@@ -80,7 +84,7 @@ defmodule ApiV1Test do
 
     it "invalidates other tokes by 'jti' value" do
       token1 = get_new_token
-      token2 = post('/login', %{:user_id => correct_id, :password => correct_password })
+      token2 = post('/login', %{user_id: correct_id, password: correct_password })
       jti = Token.extract(token2, "jti")
 
       get('/verify_token?token=#{token2}') |> "1"
@@ -147,7 +151,7 @@ defmodule ApiV1Test do
 
   describe "CORS" do
     it "should be enabled for POST" do
-      headers = post_headers('/login', %{:user_id => correct_id, :password => correct_password })
+      headers = post_headers('/login', %{user_id: correct_id, password: correct_password })
       headers |> contains {'access-control-allow-origin', 'http://localhost:9000'}
     end
     it "should be enabled for GET" do
@@ -165,7 +169,16 @@ defmodule ApiV1Test do
 
   describe "/user/new" do
     it "should return error for existing user" do
-      post_http_code('/user/new', %{:user_id => correct_id, :password => correct_password })|> 409
+      post_http_code('/user/new', %{user_id: correct_id, password: correct_password })|> 409
+    end
+
+    it "should create new user" do
+      User.find_by_uid(incorrect_id) |> nil
+      post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password })|> 201
+
+      User.find_by_uid(incorrect_id) |> ! nil
+
+      AuthStralia.Storage.DB.delete(User.find_by_uid(incorrect_id)) |> :ok
     end
   end
 end

@@ -14,11 +14,15 @@ defmodule AuthStralia.API.V1.Helpers do
     send_resp(200, data)
   end
 
+  def send_201(conn, data) do
+    send_resp(conn, 201, data)
+  end
+
   def send_401 conn do
     send_resp(conn, 401, "Authorization failed")
   end
 
-  def send_409(conn, reason) do
-    send_resp(conn, 409, reason)
+  def send_409(conn, data) do
+    send_resp(conn, 409, data)
   end
 end
