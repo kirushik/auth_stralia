@@ -17,4 +17,8 @@ defmodule AuthStralia.API.V1.Helpers do
   def send_401 conn do
     send_resp(conn, 401, "Authorization failed")
   end
+
+  def send_409(conn, reason) do
+    send_resp(conn, 409, reason)
+  end
 end

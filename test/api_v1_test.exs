@@ -162,4 +162,10 @@ defmodule ApiV1Test do
       Enum.find(headers, &(match?({'access-control-allow-headers', _}, &1))) |> equals {'access-control-allow-headers', 'accept, authorization, content-type, origin, x-requested-with'}
     end
   end
+
+  describe "/user/new" do
+    it "should return error for existing user" do
+      post_http_code('/user/new', %{:user_id => correct_id, :password => correct_password })|> 409
+    end
+  end
 end

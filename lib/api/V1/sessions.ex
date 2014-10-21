@@ -1,4 +1,4 @@
-defmodule AuthStralia.API.V1.SessionController do
+defmodule AuthStralia.API.V1.SessionsController do
   use Plug.Router
 
   alias AuthStralia.Redis.Session, as: Session
