@@ -38,8 +38,8 @@ defmodule Localhost do
         code
       end
 
-      def get_headers(relative_path, headers \\ []) do
-        {:ok, {{_,200,_},resp_headers,_}} =  Localhost.make_options_request(relative_path, unquote(api_version), headers)
+      def fetch_headers(method, relative_path, headers \\ []) do
+        {:ok, {{_,200,_},resp_headers,_}} =  Localhost.make_request(method, relative_path, unquote(api_version), headers)
         resp_headers
       end
 
@@ -53,6 +53,12 @@ defmodule Localhost do
         params = Localhost.params_to_string(params)
         {:ok, {{_,code,_},_,_}} = Localhost.make_post_request(relative_path, unquote(api_version), headers, params)
         code
+      end
+
+      def post_headers(relative_path, params \\ %{}, headers \\ []) do
+        params = Localhost.params_to_string(params)
+        {:ok, {{_,200,_},headers,_}} = Localhost.make_post_request(relative_path, unquote(api_version), headers, params)
+        headers
       end
     end
   end
@@ -75,21 +81,14 @@ defmodule Localhost do
       [], [])
   end
 
-  def make_options_request(relative_path, api_version, headers) do
-    headers = prepare_headers headers
-    :httpc.request(
-      :options,
-      {
-        'http://localhost:#{S.port}/api/#{api_version}#{relative_path}',
-        headers
-      },
-      [], [])
+  def make_get_request(relative_path, api_version, headers) do
+    make_request(:get, relative_path, api_version, headers)
   end
 
-  def make_get_request(relative_path, api_version, headers) do
+  def make_request(method, relative_path, api_version, headers) do
     headers = prepare_headers headers
     :httpc.request(
-      :get,
+      method,
       {
         'http://localhost:#{S.port}/api/#{api_version}#{relative_path}',
         headers
