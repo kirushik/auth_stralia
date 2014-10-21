@@ -5,7 +5,7 @@ defmodule AuthStralia.API.V1.Router do
   import Plug.Conn
   import AuthStralia.API.V1.Helpers
 
-  # plug :enable_cors
+  plug :enable_cors
   plug :verify_token_presence, %{paths: ["session"]}
 
   plug :match
@@ -35,6 +35,10 @@ defmodule AuthStralia.API.V1.Router do
     else
       conn
     end
+  end
+
+  defp enable_cors(conn, _opts) do
+    put_resp_header(conn, "access-control-allow-origin", "*")
   end
 
 end
