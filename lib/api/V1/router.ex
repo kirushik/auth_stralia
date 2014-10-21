@@ -16,7 +16,7 @@ defmodule AuthStralia.API.V1.Router do
     conn |>
     put_resp_header("access-control-allow-origin", "*") |>
     put_resp_header("access-control-allow-methods", "GET, OPTIONS, POST") |>
-    put_resp_header("access-control-allow-headers", "CONTENT-TYPE") |>
+    put_resp_header("access-control-allow-headers", "AUTHORIZATION, CONTENT-TYPE") |>
     http_ok ""
   end
 

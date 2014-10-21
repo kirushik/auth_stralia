@@ -159,7 +159,7 @@ defmodule ApiV1Test do
       headers |> contains {'access-control-allow-origin', '*'}
       # Not the best way, but should work
       Enum.find(headers, &(match?({'access-control-allow-methods', _}, &1))) |> equals {'access-control-allow-methods', 'GET, OPTIONS, POST'}
-      Enum.find(headers, &(match?({'access-control-allow-headers', _}, &1))) |> equals {'access-control-allow-headers', 'CONTENT-TYPE'}
+      Enum.find(headers, &(match?({'access-control-allow-headers', _}, &1))) |> equals {'access-control-allow-headers', 'AUTHORIZATION, CONTENT-TYPE'}
     end
   end
 end
