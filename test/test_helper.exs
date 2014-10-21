@@ -5,7 +5,7 @@ defmodule TokenOperations do
   alias Settings, as: S
   # May be yet another module for this?
   def correct_id, do: "alice@example.com"
-  def incorrect_id, do: "not.exist@example.com"
+  def incorrect_id, do: "does.not.exist@example.com"
   def correct_password, do: "CorrectPassword"
   def incorrect_password, do: "Incorrect password"
   def tag1, do: "qqq"

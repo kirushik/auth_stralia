@@ -180,5 +180,14 @@ defmodule ApiV1Test do
 
       AuthStralia.Storage.DB.delete(User.find_by_uid(incorrect_id)) |> :ok
     end
+
+    it "should provide a verification token" do
+      # FIXME It's almos the point when Localhost macros should be rewritten in a better fashion
+      params = Localhost.params_to_string %{user_id: incorrect_id, password: incorrect_password }
+      {:ok, {{_,201,_},_,code}} = Localhost.make_post_request('/user/new', "V1", [], params)
+      Token.parse(to_string(code))
+
+      AuthStralia.Storage.DB.delete(User.find_by_uid(incorrect_id)) |> :ok
+    end
   end
 end

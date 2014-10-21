@@ -18,8 +18,15 @@ defmodule AuthStralia.API.V1.UsersController do
 
     case User.find_by_uid(user_id) do
     nil ->
-      User.create(user_id, password)
-      send_201(conn, "Created user #{user_id}")
+      u = User.create(user_id, password)
+
+      #TODO Some special kind of verification token?
+      data = [ sub: user_id,
+      #TODO We should introduce hostname setting here
+               iss: "auth.example.com",
+               jti: session_id]
+
+      send_201(conn, Token.compose(data))
     _ ->
       send_409(conn, "User user_id is already in the database")
     end
