@@ -67,14 +67,14 @@ defmodule ApiV1Test do
 
     it "works with correct token in Bearer" do
       token = get_new_token
-      post('/session/invalidate', %{}, [{'bearer', token}]) |> "1"
+      post('/session/invalidate', %{}, [{'Authorization', 'Bearer #{token}'}]) |> "1"
     end
 
     it "invalidates token" do
       token = get_new_token
       get('/verify_token?token=#{token}') |> "1"
-      post('/session/invalidate', %{}, [{'bearer', token}]) |> "1"
-      post('/session/invalidate', %{}, [{'bearer', token}]) |> "0"
+      post('/session/invalidate', %{}, [{'Authorization', 'Bearer #{token}'}]) |> "1"
+      post('/session/invalidate', %{}, [{'Authorization', 'Bearer #{token}'}]) |> "0"
       get('/verify_token?token=#{token}') |> "0"
     end
 
@@ -84,7 +84,7 @@ defmodule ApiV1Test do
       jti = Token.extract(token2, "jti")
 
       get('/verify_token?token=#{token2}') |> "1"
-      post('/session/invalidate', %{jti: jti}, [{'bearer', token2}]) |> "1"
+      post('/session/invalidate', %{jti: jti}, [{'Authorization', 'Bearer #{token2}'}]) |> "1"
       get('/verify_token?token=#{token1}') |> "1"
       get('/verify_token?token=#{token2}') |> "0"
     end
@@ -93,14 +93,14 @@ defmodule ApiV1Test do
   describe "/session/invalidate/all" do
     it "invalidates two tokens at once" do
       token0 = get_new_token
-      post('/session/invalidate/all', %{}, [{'bearer', token0}])
+      post('/session/invalidate/all', %{}, [{'Authorization', 'Bearer #{token0}'}])
 
       token1 = get_new_token
       token2 = get_new_token
       get('/verify_token?token=#{token1}') |> "1"
       get('/verify_token?token=#{token2}') |> "1"
 
-      post('/session/invalidate/all', %{}, [{'bearer', token1}]) |> "2"
+      post('/session/invalidate/all', %{}, [{'Authorization', 'Bearer #{token1}'}]) |> "2"
 
       get('/verify_token?token=#{token1}') |> "0"
       get('/verify_token?token=#{token2}') |> "0"
@@ -119,13 +119,13 @@ defmodule ApiV1Test do
     it "lists all sessions" do
       token0 = get_new_token
       # Ensure there are no sessions for our user
-      post('/session/invalidate/all', %{}, [{'bearer', token0}])
+      post('/session/invalidate/all', %{}, [{'Authorization', 'Bearer #{token0}'}])
 
 
       token1 = get_new_token
       token2 = get_new_token
 
-      {:ok, sessions} = JSON.decode get('/session/list', [{'bearer', token1}])
+      {:ok, sessions} = JSON.decode get('/session/list', [{'Authorization', 'Bearer #{token1}'}])
       length(sessions) |> 2
       sessions |> contains Token.extract(token1, "jti")
       sessions |> contains Token.extract(token2, "jti")
@@ -140,7 +140,7 @@ defmodule ApiV1Test do
     it "updates token expiration time" do
       token = get_new_token
       token = Token.update_expiration_time(token, 3)
-      new_token = post('/session/update', %{}, [{'bearer', token}])
+      new_token = post('/session/update', %{}, [{'Authorization', 'Bearer #{token}'}])
       (Token.extract(new_token, "exp") > 3) |> truthy # Not the best way, certainly
     end
   end

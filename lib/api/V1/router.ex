@@ -26,9 +26,9 @@ defmodule AuthStralia.API.V1.Router do
 
   defp verify_token_presence(conn, %{paths: paths}) do
     if List.first(conn.path_info) in paths do
-      case get_req_header(conn, "bearer") do
-      [token] ->
-        conn
+      case get_req_header(conn, "authorization") do
+      ["Bearer " <> token] ->
+        conn |> put_private(:token, token)
       _ ->
         send_401 conn |> halt
       end
