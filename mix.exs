@@ -1,3 +1,5 @@
+Code.load_file("settings.ex")
+
 defmodule AuthStralia.Mixfile do
   use Mix.Project
 
@@ -5,30 +7,33 @@ defmodule AuthStralia.Mixfile do
     [
       app: :auth_stralia,
       version: "0.0.1",
-      elixir: "~> 0.13.1",
+      elixir: "~> 1.0.0",
       deps: deps
     ]
   end
 
-  # Configuration for the OTP application
-  #
-  # Type `mix help compile.app` for more information
   def application do
     [
-      applications: [:inets],
+      applications: [:logger, :crypto, :exredis, :postgrex, :ecto, :cowboy, :plug],
       registered: [:auth_stralia],
-      mod: {AuthStralia, []}
+      mod: {AuthStralia, []},
+
+      env: Config.get(Mix.env)
     ]
   end
 
-  # List all dependencies in the format:
-  #
-  # {:foobar, git: "https://github.com/elixir-lang/foobar.git", tag: "0.1"}
-  #
-  # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:elli_http_handler, github: "kirushik/ellihandler"},
+      {:plug, "~> 0.8.1"},
+      {:cowboy, "~> 1.0.0"},
+      {:ejwt, github: "kato-im/ejwt"},
+      {:amrita, github: "josephwilk/amrita"},
+      {:exredis, github: "artemeff/exredis"},
+      {:uuid, github: "avtobiff/erlang-uuid", tag: "v0.4.6"},
+      {:json, github: "cblage/elixir-json"},
+      {:postgrex, github: "ericmj/postgrex", tag: "v0.6.0", override: true},
+      {:ecto, "0.2.5"},
+      {:pbkdf2, github: "basho/erlang-pbkdf2", tag: "2.0.0"}
     ]
   end
 end
