@@ -5,11 +5,17 @@ defmodule AuthStralia.API.V1.Router do
   import Plug.Conn
   import AuthStralia.API.V1.Helpers
 
+  # plug :enable_cors
   plug :verify_token_presence, %{paths: ["session"]}
 
   plug :match
   plug :dispatch
 
+  # Enabling CORS on all the endpoints
+  options _ do
+    put_resp_header(conn, "Access-Control-Allow-Origin", "*") |>
+    http_ok ""
+  end
 
   forward "login", to: AuthStralia.API.V1.LoginController
   forward "verify_token", to: AuthStralia.API.V1.VerifyTokenController
