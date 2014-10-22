@@ -38,17 +38,17 @@ defmodule AuthStralia.API.V1.UsersController do
     conn = fetch_params(conn)
     %{"token" => token} = conn.params
     case Token.parse(token) do
-    :invalid ->
-      send_400 conn
-    claims when is_map(claims) ->
-      case User.find_by_uid claims.sub do
+    %{typ: "user_verification_token", sub: user_id} ->
+      case User.find_by_uid user_id do
       nil ->
         send_404 conn
       %User{verified: true} ->
-        send_409(conn, "User #{claims.sub} is already verified")
+        send_409(conn, "User #{user_id} is already verified")
       user ->
         http_ok(conn, "")
       end
+    _ ->
+      send_400 conn
     end
   end
 end

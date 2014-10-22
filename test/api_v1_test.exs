@@ -212,7 +212,12 @@ defmodule ApiV1Test do
       get_http_code('/user/verify?token=QQQQiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0MDAwOTQ3NDF9.P9QOLoJg4MCnHeb3WTceFL-_fdHlkH1dJJzKwW-OHD') |> 400
     end
 
-    it "should return 400 for correct non-verification type token"
+    it "should return 400 for correct non-verification type token" do
+      token = generate_token(%{ sub: incorrect_id,
+                                iss: "auth.example.com",
+                                jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" })
+      get_http_code('/user/verify?token=#{token}') |> 400
+    end
 
     it "should return 404 for valid token for nonexistent user" do
       token = generate_token(%{ sub: incorrect_id,
