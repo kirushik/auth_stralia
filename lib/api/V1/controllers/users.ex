@@ -24,7 +24,9 @@ defmodule AuthStralia.API.V1.UsersController do
       data = [ sub: user_id,
       #TODO We should introduce hostname setting here
                iss: "auth.example.com",
-               jti: "session_id"]
+               jti: "session_id", # TODO
+               typ: "user_verification_token"
+             ]
 
       send_201(conn, Token.compose(data))
     _ ->
@@ -33,6 +35,13 @@ defmodule AuthStralia.API.V1.UsersController do
   end
 
   get "verify" do
-    send_400 conn
+    conn = fetch_params(conn)
+    %{"token" => token} = conn.params
+    case Token.parse(token) do
+    :invalid ->
+      send_400 conn
+    claims when is_list(claims) ->
+      send_404 conn
+    end
   end
 end
