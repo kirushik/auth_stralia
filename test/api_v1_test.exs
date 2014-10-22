@@ -185,12 +185,12 @@ defmodule ApiV1Test do
 
   describe "/user/new" do
     it "should return error for existing user" do
-      post_http_code('/user/new', %{user_id: correct_id, password: correct_password })|> 409
+      post_http_code('/user/new', %{user_id: correct_id, password: correct_password }) |> 409
     end
 
     it "should create new user" do
       User.find_by_uid(incorrect_id) |> nil
-      post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password })|> 201
+      post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password }) |> 201
       User.find_by_uid(incorrect_id) |> ! nil
     end
 
@@ -202,8 +202,8 @@ defmodule ApiV1Test do
     end
 
     it "should return 409 for subsequent registration requests" do
-      post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password })|> 201
-      post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password })|> 409
+      post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password }) |> 201
+      post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password }) |> 409
     end
   end
 
@@ -237,7 +237,7 @@ defmodule ApiV1Test do
     end
 
     it "should return 419 for an expired verification token" do
-      post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password })|> 201
+      post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password }) |> 201
       token = generate_token(%{ sub: incorrect_id,
                                 iss: "auth.example.com",
                                 jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54",
@@ -261,13 +261,15 @@ defmodule ApiV1Test do
 
   describe "/user/proof_token" do
     it "should not work for a validated user" do
-      get_http_code('/user/proof_token?user_id=#{correct_id}')|>403
+      get_http_code('/user/proof_token?user_id=#{correct_id}') |> 403
     end
 
     it "should not work for an non-existing user" do
-      get_http_code('/user/proof_token?user_id=#{incorrect_id}')|>404
+      get_http_code('/user/proof_token?user_id=#{incorrect_id}') |> 404
     end
+
     it "should prolong non-expired token"
+
     it "should reissue expired token"
   end
 end
