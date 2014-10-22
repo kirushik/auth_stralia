@@ -58,4 +58,11 @@ defmodule AuthStralia.API.V1.UsersController do
       send_400 conn
     end
   end
+
+  get "proof_token" do
+    conn = fetch_params(conn)
+    %{"user_id" => user_id} = conn.params
+
+    send_403 conn
+  end
 end

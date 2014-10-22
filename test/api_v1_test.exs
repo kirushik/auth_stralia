@@ -213,6 +213,7 @@ defmodule ApiV1Test do
     end
 
     it "should return 400 for correct non-verification type token" do
+      #TODO dedulicate this
       token = generate_token(%{ sub: incorrect_id,
                                 iss: "auth.example.com",
                                 jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" })
@@ -256,5 +257,15 @@ defmodule ApiV1Test do
       get_http_code('/user/verify?token=#{token}') |> 200
       post_http_code('/login', %{user_id: incorrect_id, password: incorrect_password}) |> 200
     end
+  end
+
+  describe "/user/proof_token" do
+    it "should not work for a validated user" do
+      get_http_code('/user/proof_token?user_id=#{correct_id}')|>403
+    end
+
+    it "should not work for an non-existing user"
+    it "should prolong non-expired token"
+    it "should reissue expired token"
   end
 end

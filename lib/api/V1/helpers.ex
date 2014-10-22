@@ -26,6 +26,10 @@ defmodule AuthStralia.API.V1.Helpers do
     send_resp(conn, 401, "Authorization failed")
   end
 
+  def send_403 conn do
+    send_resp(conn, 403, "User is already verified")
+  end
+
   def send_404 conn do
     send_resp(conn, 404, "Not found")
   end
