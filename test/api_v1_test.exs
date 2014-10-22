@@ -131,7 +131,6 @@ defmodule ApiV1Test do
       # Ensure there are no sessions for our user
       post('/session/invalidate/all', %{}, [{'Authorization', 'Bearer #{token0}'}])
 
-
       token1 = get_new_token
       token2 = get_new_token
 
@@ -150,7 +149,6 @@ defmodule ApiV1Test do
     it "updates token expiration time" do
       old_token = get_new_token
       old_token = Token.update_expiration_time(old_token, 3)
-      session_id =
       new_token = post('/session/update', %{}, [{'Authorization', 'Bearer #{old_token}'}])
       (Token.extract(new_token, "exp") > 3) |> truthy # Not the best way, certainly
       Token.extract(new_token, "jti") |> equals Token.extract(old_token, "jti")
@@ -169,7 +167,7 @@ defmodule ApiV1Test do
     it "should be enabled for OPTIONS" do
       headers = fetch_headers(:options, '/login')
       headers |> contains {'access-control-allow-origin', 'http://localhost:9000'}
-      # Not the best way, but should work
+      #TODO Not the best way, but should work
       Enum.find(headers, &(match?({'access-control-allow-methods', _}, &1))) |> equals {'access-control-allow-methods', 'GET, OPTIONS, POST'}
       Enum.find(headers, &(match?({'access-control-allow-headers', _}, &1))) |> equals {'access-control-allow-headers', 'accept, authorization, content-type, origin, x-requested-with'}
     end
@@ -191,6 +189,12 @@ defmodule ApiV1Test do
       params = Localhost.params_to_string %{user_id: incorrect_id, password: incorrect_password }
       {:ok, {{_,201,_},_,code}} = Localhost.make_post_request('/user/new', "V1", [], params)
       Token.parse(to_string(code))
+    end
+  end
+
+  describe "/user/verify" do
+    it "should return 400 for malformed token" do
+      get_http_code('/user/verify?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0MDAwOTQ3NDF9.P9QOLoJg4MCnHeb3WTceFL-_fdHlkH1dJJzKwW-OHD') |> 400
     end
   end
 end

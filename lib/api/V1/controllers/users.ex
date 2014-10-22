@@ -28,8 +28,11 @@ defmodule AuthStralia.API.V1.UsersController do
 
       send_201(conn, Token.compose(data))
     _ ->
-      send_409(conn, "User user_id is already in the database")
+      send_409(conn, "User #{user_id} is already in the database")
     end
   end
 
+  get "verify" do
+    send_400 conn
+  end
 end

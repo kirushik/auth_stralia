@@ -18,6 +18,10 @@ defmodule AuthStralia.API.V1.Helpers do
     send_resp(conn, 201, data)
   end
 
+  def send_400 conn do
+    send_resp(conn, 400, "Unable to parse the token provided")
+  end
+
   def send_401 conn do
     send_resp(conn, 401, "Authorization failed")
   end
