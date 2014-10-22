@@ -201,7 +201,10 @@ defmodule ApiV1Test do
       Token.parse(to_string(code))
     end
 
-    it "should return 409 for subsequent registration requests"
+    it "should return 409 for subsequent registration requests" do
+      post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password })|> 201
+      post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password })|> 409
+    end
   end
 
   describe "/user/verify" do
