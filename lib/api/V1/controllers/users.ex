@@ -47,6 +47,7 @@ defmodule AuthStralia.API.V1.UsersController do
       %User{verified: true} ->
         send_409(conn, "User #{user_id} is already verified")
       user ->
+        User.verify user
         http_ok(conn, "")
       end
 

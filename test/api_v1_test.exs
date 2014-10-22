@@ -250,6 +250,11 @@ defmodule ApiV1Test do
       get_http_code('/user/verify?token=#{token}') |> 200
     end
 
-    it "should allow user to login after the verification"
+    it "should allow user to login after the verification" do
+      params = Localhost.params_to_string %{user_id: incorrect_id, password: incorrect_password }
+      {:ok, {{_,201,_},_,token}} = Localhost.make_post_request('/user/new', "V1", [], params)
+      get_http_code('/user/verify?token=#{token}') |> 200
+      post_http_code('/login', %{user_id: incorrect_id, password: incorrect_password}) |> 200
+    end
   end
 end
