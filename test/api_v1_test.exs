@@ -213,33 +213,23 @@ defmodule ApiV1Test do
     it "should return 400 for correct non-verification type token" do
       #TODO dedulicate this
       token = generate_token(%{ sub: incorrect_id,
-                                iss: "auth.example.com",
-                                jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" })
+                                typ: "some_other_token" })
       get_http_code('/user/verify?token=#{token}') |> 400
     end
 
     it "should return 404 for valid token for nonexistent user" do
-      token = generate_token(%{ sub: incorrect_id,
-                                iss: "auth.example.com",
-                                jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54",
-                                typ: "user_verification_token" })
+      token = Token.generate_verification_token(incorrect_id)
       get_http_code('/user/verify?token=#{token}') |> 404
     end
 
     it "should return 409 if user is already verified" do
-      token = generate_token(%{ sub: correct_id,
-                                iss: "auth.example.com",
-                                jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54",
-                                typ: "user_verification_token" })
+      token = Token.generate_verification_token(correct_id)
       get_http_code('/user/verify?token=#{token}') |> 409
     end
 
     it "should return 419 for an expired verification token" do
       post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password }) |> 201
-      token = generate_token(%{ sub: incorrect_id,
-                                iss: "auth.example.com",
-                                jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54",
-                                typ: "user_verification_token" }, 0)
+      token = Token.generate_verification_token(incorrect_id, -Settings.expiresIn - 1)
       get_http_code('/user/verify?token=#{token}') |> 401 #NOTE see helpers.ex:38
     end
 
@@ -275,7 +265,6 @@ defmodule ApiV1Test do
       (old_claims.exp < new_claims.exp) |> truthy
     end
 
-    it "should reissue expired token" do
-    end
+    it "should reissue expired token"
   end
 end
