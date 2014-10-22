@@ -63,6 +63,12 @@ defmodule AuthStralia.API.V1.UsersController do
     conn = fetch_params(conn)
     %{"user_id" => user_id} = conn.params
 
-    send_403 conn
+    case user = User.find_by_uid user_id do
+    %User{verified: true} ->
+      send_403 conn
+    nil ->
+      send_404 conn
+    end
+
   end
 end

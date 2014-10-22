@@ -264,7 +264,9 @@ defmodule ApiV1Test do
       get_http_code('/user/proof_token?user_id=#{correct_id}')|>403
     end
 
-    it "should not work for an non-existing user"
+    it "should not work for an non-existing user" do
+      get_http_code('/user/proof_token?user_id=#{incorrect_id}')|>404
+    end
     it "should prolong non-expired token"
     it "should reissue expired token"
   end
