@@ -197,8 +197,8 @@ defmodule ApiV1Test do
     it "should provide a verification token" do
       # FIXME It's almost the point when Localhost macros should be rewritten in a better fashion
       params = Localhost.params_to_string %{user_id: incorrect_id, password: incorrect_password }
-      {:ok, {{_,201,_},_,code}} = Localhost.make_post_request('/user/new', "V1", [], params)
-      Token.parse(to_string(code))
+      {:ok, {{_,201,_},_,token}} = Localhost.make_post_request('/user/new', "V1", [], params)
+      Token.parse(to_string(token))
     end
 
     it "should return 409 for subsequent registration requests" do
@@ -244,7 +244,12 @@ defmodule ApiV1Test do
       get_http_code('/user/verify?token=#{token}') |> 401 #NOTE see helpers.ex:38
     end
 
-    it "should return 200 for correct verification request"
+    it "should return 200 for correct verification request" do
+      params = Localhost.params_to_string %{user_id: incorrect_id, password: incorrect_password }
+      {:ok, {{_,201,_},_,token}} = Localhost.make_post_request('/user/new', "V1", [], params)
+      get_http_code('/user/verify?token=#{token}') |> 200
+    end
+
     it "should allow user to login after the verification"
   end
 end
