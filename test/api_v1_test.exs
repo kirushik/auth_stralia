@@ -42,6 +42,8 @@ defmodule ApiV1Test do
       tags = Token.extract(response, :tags)
       [tag1, tag2] |> tags
     end
+
+    it "shouldn't login unverified users"
   end
 
   describe "/verify_token" do

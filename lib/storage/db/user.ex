@@ -7,6 +7,7 @@ defmodule AuthStralia.Storage.User do
     #TODO Validations
     field :salt
     field :password_hash
+    field :verified, :boolean
     has_many :tag_to_user_mappings, AuthStralia.Storage.TagToUserMapping, [foreign_key: :user_id]
   end
 

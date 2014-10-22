@@ -41,7 +41,14 @@ defmodule AuthStralia.API.V1.UsersController do
     :invalid ->
       send_400 conn
     claims when is_map(claims) ->
-      send_404 conn
+      case User.find_by_uid claims.sub do
+      nil ->
+        send_404 conn
+      %User{verified: true} ->
+        send_409(conn, "User #{claims.sub} is already verified")
+      user ->
+        http_ok(conn, "")
+      end
     end
   end
 end
