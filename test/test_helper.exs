@@ -32,7 +32,7 @@ defmodule Localhost do
     quote bind_quoted: [api_version: api_version] do
       def get(relative_path, headers \\ []) do
         {:ok, {{_,200,_},_,response}} = Localhost.make_get_request(relative_path, unquote(api_version), headers)
-        List.to_string response
+        to_string response
       end
 
       def get_http_code(relative_path, headers \\ []) do
@@ -48,7 +48,13 @@ defmodule Localhost do
       def post(relative_path, params \\ %{}, headers \\ []) do
         params = Localhost.params_to_string(params)
         {:ok, {{_,200,_},_,response}} = Localhost.make_post_request(relative_path, unquote(api_version), headers, params)
-        List.to_string response
+        to_string response
+      end
+
+      def post_201_response(relative_path, params \\ %{}, headers \\ []) do
+        params = Localhost.params_to_string params
+        {:ok, {{_,201,_},_,response}} = Localhost.make_post_request(relative_path, unquote(api_version), headers, params)
+        to_string response
       end
 
       def post_http_code(relative_path, params \\ %{}, headers \\ []) do

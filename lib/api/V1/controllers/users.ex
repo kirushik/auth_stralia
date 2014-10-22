@@ -20,15 +20,9 @@ defmodule AuthStralia.API.V1.UsersController do
     nil ->
       User.create(user_id, password)
 
-      #TODO Some special kind of verification token?
-      data = %{ sub: user_id,
-      #TODO We should introduce hostname setting here
-                iss: "auth.example.com",
-                jti: "session_id", # TODO
-                typ: "user_verification_token"
-              }
+      token = Token.generate_verification_token(user_id)
 
-      send_201(conn, Token.compose(data))
+      send_201(conn, token)
     _ ->
       send_409(conn, "User #{user_id} is already in the database")
     end
@@ -63,9 +57,11 @@ defmodule AuthStralia.API.V1.UsersController do
     conn = fetch_params(conn)
     %{"user_id" => user_id} = conn.params
 
-    case user = User.find_by_uid user_id do
+    case User.find_by_uid user_id do
     %User{verified: true} ->
       send_403 conn
+    %User{verified: false} ->
+      http_ok conn, Token.generate_verification_token user_id
     nil ->
       send_404 conn
     end
