@@ -11,6 +11,7 @@ defmodule AuthStralia.Storage.User do
     has_many :tag_to_user_mappings, AuthStralia.Storage.TagToUserMapping, [foreign_key: :user_id]
   end
 
+
   #TODO We could do better than defaulting to empty passwords
   def create(user_id, password \\ "", tags \\ []) do
     salt = generate_salt
@@ -42,6 +43,11 @@ defmodule AuthStralia.Storage.User do
   end
   def tags(user) do
     user.tag_to_user_mappings.all |> Enum.map &(&1.tag_id)
+  end
+
+  def verify(user) do
+    user = %{user | verified: true}
+    DB.update user
   end
 
   defp hash_password(password, salt) do

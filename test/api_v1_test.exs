@@ -15,7 +15,8 @@ defmodule ApiV1Test do
     tag1_entity = AuthStralia.Storage.Tag.create(tag1)
     tag2_entity = AuthStralia.Storage.Tag.create(tag2)
 
-    User.create(correct_id, correct_password, [tag1_entity, tag2_entity])
+    user = User.create(correct_id, correct_password, [tag1_entity, tag2_entity])
+    User.verify user
     :ok
   end
 
