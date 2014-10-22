@@ -30,7 +30,7 @@ defmodule ApiV1Test do
       response = post('/login', %{user_id: correct_id, password: correct_password })
       parsed = Token.parse(response)
       parsed |> ! :invalid
-      is_list(parsed) |> truthy
+      is_map(parsed) |> truthy
     end
 
     it "returns 401 when incorrect password" do
@@ -39,7 +39,7 @@ defmodule ApiV1Test do
 
     it "returns token with tags" do
       response = post('/login', %{user_id: correct_id, password: correct_password })
-      tags = Token.extract(response, "tags")
+      tags = Token.extract(response, :tags)
       [tag1, tag2] |> tags
     end
   end
@@ -60,7 +60,7 @@ defmodule ApiV1Test do
     end
 
     it "returns '0' for expired token" do
-      token = generate_token({[]}, -1)
+      token = generate_token(%{}, -1)
       get('/verify_token?token=#{token}') |> "0"
     end
 
@@ -91,7 +91,7 @@ defmodule ApiV1Test do
     it "invalidates other tokes by 'jti' value" do
       token1 = get_new_token
       token2 = post('/login', %{user_id: correct_id, password: correct_password })
-      jti = Token.extract(token2, "jti")
+      jti = Token.extract(token2, :jti)
 
       get('/verify_token?token=#{token2}') |> "1"
       post('/session/invalidate', %{jti: jti}, [{'Authorization', 'Bearer #{token2}'}]) |> "1"
@@ -136,8 +136,8 @@ defmodule ApiV1Test do
 
       {:ok, sessions} = JSON.decode get('/session/list', [{'Authorization', 'Bearer #{token1}'}])
       length(sessions) |> 2
-      sessions |> contains Token.extract(token1, "jti")
-      sessions |> contains Token.extract(token2, "jti")
+      sessions |> contains Token.extract(token1, :jti)
+      sessions |> contains Token.extract(token2, :jti)
     end
   end
 
@@ -150,8 +150,8 @@ defmodule ApiV1Test do
       old_token = get_new_token
       old_token = Token.update_expiration_time(old_token, 3)
       new_token = post('/session/update', %{}, [{'Authorization', 'Bearer #{old_token}'}])
-      (Token.extract(new_token, "exp") > 3) |> truthy # Not the best way, certainly
-      Token.extract(new_token, "jti") |> equals Token.extract(old_token, "jti")
+      (Token.extract(new_token, :exp) > 3) |> truthy # Not the best way, certainly
+      Token.extract(new_token, :jti) |> equals Token.extract(old_token, :jti)
     end
   end
 
@@ -202,13 +202,19 @@ defmodule ApiV1Test do
     it "should return 400 for correct non-verification type token"
 
     it "should return 404 for valid token for nonexistent user" do
-      token = generate_token({[ sub: incorrect_id,
+      token = generate_token(%{ sub: incorrect_id,
                                 iss: "auth.example.com",
                                 jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54",
-                                typ: "user_verification_token" ]})
+                                typ: "user_verification_token" })
       get_http_code('/user/verify?token=#{token}') |> 404
     end
-    it "should return 409 if user is already verified"
+    it "should return 409 if user is already verified" do
+      token = generate_token(%{ sub: correct_id,
+                                iss: "auth.example.com",
+                                jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54",
+                                typ: "user_verification_token" })
+      get_http_code('/user/verify?token=#{token}') |> 409
+    end
     it "should return 419 for an expired verification token"
 
     it "should return 200 for correct verification request"

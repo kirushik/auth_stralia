@@ -22,11 +22,11 @@ defmodule AuthStralia.API.V1.LoginsController do
       send_401 conn
     else
       session_id = UUID.generate
-      data = [ sub: user_id,
+      data = %{ sub: user_id,
       #TODO We should introduce hostname setting here
-               iss: "auth.example.com",
-               jti: session_id,
-               tags: User.tags(user_id) ]
+                iss: "auth.example.com",
+                jti: session_id,
+                tags: User.tags(user_id) }
 
       Session.new(user_id, session_id)
 

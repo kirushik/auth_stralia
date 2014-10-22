@@ -18,15 +18,15 @@ defmodule AuthStralia.API.V1.UsersController do
 
     case User.find_by_uid(user_id) do
     nil ->
-      u = User.create(user_id, password)
+      User.create(user_id, password)
 
       #TODO Some special kind of verification token?
-      data = [ sub: user_id,
+      data = %{ sub: user_id,
       #TODO We should introduce hostname setting here
-               iss: "auth.example.com",
-               jti: "session_id", # TODO
-               typ: "user_verification_token"
-             ]
+                iss: "auth.example.com",
+                jti: "session_id", # TODO
+                typ: "user_verification_token"
+              }
 
       send_201(conn, Token.compose(data))
     _ ->
@@ -40,7 +40,7 @@ defmodule AuthStralia.API.V1.UsersController do
     case Token.parse(token) do
     :invalid ->
       send_400 conn
-    claims when is_list(claims) ->
+    claims when is_map(claims) ->
       send_404 conn
     end
   end
