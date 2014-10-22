@@ -19,6 +19,12 @@ defmodule ApiV1Test do
     :ok
   end
 
+  setup do
+    incorrect_user = User.find_by_uid(incorrect_id)
+    if incorrect_user, do: AuthStralia.Storage.DB.delete incorrect_user
+    :ok
+  end
+
   describe "/login" do
     it "returns correct JSON web token" do
       response = post('/login', %{user_id: correct_id, password: correct_password })
@@ -175,19 +181,14 @@ defmodule ApiV1Test do
     it "should create new user" do
       User.find_by_uid(incorrect_id) |> nil
       post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password })|> 201
-
       User.find_by_uid(incorrect_id) |> ! nil
-
-      AuthStralia.Storage.DB.delete(User.find_by_uid(incorrect_id)) |> :ok
     end
 
     it "should provide a verification token" do
-      # FIXME It's almos the point when Localhost macros should be rewritten in a better fashion
+      # FIXME It's almost the point when Localhost macros should be rewritten in a better fashion
       params = Localhost.params_to_string %{user_id: incorrect_id, password: incorrect_password }
       {:ok, {{_,201,_},_,code}} = Localhost.make_post_request('/user/new', "V1", [], params)
       Token.parse(to_string(code))
-
-      AuthStralia.Storage.DB.delete(User.find_by_uid(incorrect_id)) |> :ok
     end
   end
 end

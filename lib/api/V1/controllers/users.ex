@@ -24,7 +24,7 @@ defmodule AuthStralia.API.V1.UsersController do
       data = [ sub: user_id,
       #TODO We should introduce hostname setting here
                iss: "auth.example.com",
-               jti: session_id]
+               jti: "session_id"]
 
       send_201(conn, Token.compose(data))
     _ ->
