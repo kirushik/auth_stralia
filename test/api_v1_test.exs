@@ -38,13 +38,20 @@ defmodule ApiV1Test do
       post_http_code('/login', %{user_id: correct_id, password: incorrect_password}) |> 401
     end
 
+    it "returns 401 for incorrect username" do
+      post_http_code('/login', %{user_id: incorrect_id, password: incorrect_password}) |> 401
+    end
+
     it "returns token with tags" do
       response = post('/login', %{user_id: correct_id, password: correct_password })
       tags = Token.extract(response, :tags)
       [tag1, tag2] |> tags
     end
 
-    it "shouldn't login unverified users"
+    it "shouldn't login unverified users" do
+      User.create(incorrect_id, incorrect_password)
+      post_http_code('/login', %{user_id: incorrect_id, password: incorrect_password}) |> 401
+    end
   end
 
   describe "/verify_token" do

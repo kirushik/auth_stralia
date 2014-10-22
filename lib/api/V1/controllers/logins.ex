@@ -17,10 +17,7 @@ defmodule AuthStralia.API.V1.LoginsController do
     conn = conn |> fetch_params
     %{"user_id" => user_id, "password" => password} = conn.params
 
-
-    if (!User.check_password(user_id,password)) do
-      send_401 conn
-    else
+    if User.check_password(user_id,password) do
       session_id = UUID.generate
       data = %{ sub: user_id,
       #TODO We should introduce hostname setting here
@@ -31,6 +28,8 @@ defmodule AuthStralia.API.V1.LoginsController do
       Session.new(user_id, session_id)
 
       jwt_ok conn, Token.compose(data)
+    else
+      send_401 conn
     end
   end
 end

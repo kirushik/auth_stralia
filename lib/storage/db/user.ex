@@ -34,8 +34,13 @@ defmodule AuthStralia.Storage.User do
 
   def check_password(user_id, password) do
     user = find_by_uid(user_id)
-    #TODO Crypto string comparison
-    user != nil and user.password_hash == hash_password(password, user.salt)
+    if user==nil do
+      false
+    else
+      hash = hash_password(password, user.salt)
+      #TODO Crypto string comparison
+      match?( %AuthStralia.Storage.User{password_hash: ^hash, verified: true}, user)
+    end
   end
 
   def tags(user_id) when is_bitstring(user_id) do
