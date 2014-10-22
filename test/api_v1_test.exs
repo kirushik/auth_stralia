@@ -190,11 +190,20 @@ defmodule ApiV1Test do
       {:ok, {{_,201,_},_,code}} = Localhost.make_post_request('/user/new', "V1", [], params)
       Token.parse(to_string(code))
     end
+
+    it "should return 409 for subsequent registration requests"
   end
 
   describe "/user/verify" do
     it "should return 400 for malformed token" do
       get_http_code('/user/verify?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0MDAwOTQ3NDF9.P9QOLoJg4MCnHeb3WTceFL-_fdHlkH1dJJzKwW-OHD') |> 400
     end
+
+    it "should return 404 for valid token for nonexistent user"
+    it "should return 409 if user is already verified"
+    it "should return 419 for an expired verification token"
+
+    it "should return 200 for correct verification request"
+    it "should allow user to login only after the verification"
   end
 end
