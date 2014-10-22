@@ -148,10 +148,12 @@ defmodule ApiV1Test do
     end
 
     it "updates token expiration time" do
-      token = get_new_token
-      token = Token.update_expiration_time(token, 3)
-      new_token = post('/session/update', %{}, [{'Authorization', 'Bearer #{token}'}])
+      old_token = get_new_token
+      old_token = Token.update_expiration_time(old_token, 3)
+      session_id =
+      new_token = post('/session/update', %{}, [{'Authorization', 'Bearer #{old_token}'}])
       (Token.extract(new_token, "exp") > 3) |> truthy # Not the best way, certainly
+      Token.extract(new_token, "jti") |> equals Token.extract(old_token, "jti")
     end
   end
 
