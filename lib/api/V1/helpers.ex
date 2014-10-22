@@ -33,4 +33,8 @@ defmodule AuthStralia.API.V1.Helpers do
   def send_409(conn, data) do
     send_resp(conn, 409, data)
   end
+
+  def send_419 conn do
+    send_resp(conn, 401, "Your token has expired") #FIXME It's 401 because of Cowboy whitelisting http codes. Maybe submit a pull request there?
+  end
 end

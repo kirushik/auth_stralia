@@ -21,6 +21,10 @@ defmodule TokenTest do
       token = "adfkasjfdhlkajdshflakj"
       Token.parse(token) |> :invalid
     end
+    it "returns :expired when token is expired" do
+      token = generate_token(%{},0)
+      Token.parse(token) |> :expired
+    end
     it "updates token's expiration time" do
       old_time = epoch() + 10
       new_time = epoch() + 1000

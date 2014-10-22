@@ -226,6 +226,7 @@ defmodule ApiV1Test do
                                 typ: "user_verification_token" })
       get_http_code('/user/verify?token=#{token}') |> 404
     end
+
     it "should return 409 if user is already verified" do
       token = generate_token(%{ sub: correct_id,
                                 iss: "auth.example.com",
@@ -233,9 +234,17 @@ defmodule ApiV1Test do
                                 typ: "user_verification_token" })
       get_http_code('/user/verify?token=#{token}') |> 409
     end
-    it "should return 419 for an expired verification token"
+
+    it "should return 419 for an expired verification token" do
+      post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password })|> 201
+      token = generate_token(%{ sub: incorrect_id,
+                                iss: "auth.example.com",
+                                jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54",
+                                typ: "user_verification_token" }, 0)
+      get_http_code('/user/verify?token=#{token}') |> 401 #NOTE see helpers.ex:38
+    end
 
     it "should return 200 for correct verification request"
-    it "should allow user to login only after the verification"
+    it "should allow user to login after the verification"
   end
 end

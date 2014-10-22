@@ -37,7 +37,9 @@ defmodule AuthStralia.API.V1.UsersController do
   get "verify" do
     conn = fetch_params(conn)
     %{"token" => token} = conn.params
+
     case Token.parse(token) do
+
     %{typ: "user_verification_token", sub: user_id} ->
       case User.find_by_uid user_id do
       nil ->
@@ -47,6 +49,10 @@ defmodule AuthStralia.API.V1.UsersController do
       user ->
         http_ok(conn, "")
       end
+
+    :expired ->
+      send_419 conn
+
     _ ->
       send_400 conn
     end
