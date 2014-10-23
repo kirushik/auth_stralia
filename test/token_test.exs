@@ -48,8 +48,14 @@ defmodule TokenTest do
     it "updates token's expiration time" do
       old_time = epoch() + 10
       new_time = old_time + 990
-      token = generate_token(%{}, old_time)
-      token |> Token.update_expiration_time(1000) |> Token.parse |> Map.get(:exp) |> new_time
+      token = generate_token(%{}, old_time) |> Token.update_expiration_time(1000)
+      Token.parse(token).exp |> new_time
+    end
+
+    it "correctly updates expired tokens" do
+      now = epoch()
+      token = generate_token(%{},0) |> Token.update_expiration_time
+      Token.parse(token).exp |> equals now + Settings.expiresIn
     end
   end
 end

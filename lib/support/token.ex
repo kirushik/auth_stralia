@@ -26,7 +26,13 @@ defmodule Token do
   end
 
   def update_expiration_time(token, new_timeout \\ S.expiresIn) do
-    contents = parse(token) |> Map.delete(:exp)
+    contents =  case parse(token) do
+                :expired ->
+                  parse(token, :force) |>
+                  Map.delete(:exp)
+                claims ->
+                  Map.delete(claims, :exp)
+                end
     compose(contents, new_timeout)
   end
 
