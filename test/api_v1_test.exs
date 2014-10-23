@@ -15,7 +15,7 @@ defmodule ApiV1Test do
                 jti: session_id,
                 tags: [] }
 
-    Session.new(correct_id, session_id)
+    Session.new(correct_id, session_id, expiration_time)
     Token.compose(data)
   end
 
@@ -171,15 +171,20 @@ defmodule ApiV1Test do
     end
 
     it "updates token expiration time" do
-      old_token = get_new_token
-      old_token = Token.update_expiration_time(old_token, 3)
+      old_token = get_new_token(1)
       new_token = post('/session/update', %{}, [{'Authorization', 'Bearer #{old_token}'}])
       (Token.extract(new_token, :exp) > 3) |> truthy # Not the best way, certainly
       Token.extract(new_token, :jti) |> equals Token.extract(old_token, :jti)
     end
 
     it "updates session expiration time in Redis" do
+      raw_token = get_new_token(10)
+      token = Token.parse(raw_token)
+      Session.get_ttl(token.sub, token.jti) |> "10"
 
+      post('/session/update', %{}, [{'Authorization', 'Bearer #{raw_token}'}])
+
+      Session.get_ttl(token.sub, token.jti) |> equals to_string(Settings.expiresIn)
     end
   end
 

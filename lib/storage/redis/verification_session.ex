@@ -6,7 +6,7 @@ defmodule AuthStralia.Redis.VerificationSession do
   # Key format is 'verification_session:user_id'
   # Value format is session_id of verification session
 
-  def get(user_id) do
+  def get(user_id, expiration_time \\ S.expiresIn) do
     key = "verification_session:#{user_id}"
     redis = start
 
@@ -15,7 +15,7 @@ defmodule AuthStralia.Redis.VerificationSession do
                   else
                     UUID.generate
                   end
-    redis |> query ["SETEX", key, S.expiresIn, session_id]
+    redis |> query ["SETEX", key, expiration_time, session_id]
   end
   def check(user_id, session_id) do
     key = "verification_session:#{user_id}"

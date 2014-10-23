@@ -6,13 +6,17 @@ defmodule AuthStralia.Redis.Session do
   # Key format is 'session:user_id:session_id'
   #TODO: add some useful info (ip?) about session in stored value
   #TODO: connection pool for Redis connections
-  def new(user_id, session_id) do
+  def new(user_id, session_id, expiration_time \\ S.expiresIn) do
     key = "session:#{user_id}:#{session_id}"
-    start |> query ["SETEX", key, S.expiresIn, "1"]
+    start |> query ["SETEX", key, expiration_time, "1"]
   end
   def check(user_id, session_id) do
     key = "session:#{user_id}:#{session_id}"
     start |> query ["EXISTS", key]
+  end
+  def get_ttl(user_id, session_id) do
+    key = "session:#{user_id}:#{session_id}"
+    start |> query ["TTL", key]
   end
   def list(user_id) do
     key_mask = "session:#{user_id}:*"
