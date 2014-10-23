@@ -20,7 +20,7 @@ defmodule AuthStralia.API.V1.UsersController do
     nil ->
       User.create(user_id, password)
 
-      token = Token.generate_verification_token(user_id)
+      token = User.verification_token_for user_id
 
       send_201(conn, token)
     _ ->
@@ -61,7 +61,7 @@ defmodule AuthStralia.API.V1.UsersController do
     %User{verified: true} ->
       send_403 conn
     %User{verified: false} ->
-      http_ok conn, Token.generate_verification_token user_id
+      http_ok conn, User.verification_token_for user_id
     nil ->
       send_404 conn
     end

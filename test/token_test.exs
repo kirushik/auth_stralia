@@ -35,13 +35,13 @@ defmodule TokenTest do
     end
 
     it "correctly issues user verification tokens" do
-      token = Token.generate_verification_token("username")
-      %{sub: "username", typ: "user_verification_token"} |> match?(Token.parse(token)) |> truthy
+      token = Token.generate_verification_token("username", "session_id")
+      %{sub: "username", jti: "session_id", typ: "user_verification_token"} |> match?(Token.parse(token)) |> truthy
     end
 
     it "issues user verification tokens with proper time correction" do
       now = epoch()
-      token = Token.generate_verification_token("username", 100)
+      token = Token.generate_verification_token("username", "", 100)
       Token.parse(token).exp |> equals now + Settings.expiresIn + 100
     end
 

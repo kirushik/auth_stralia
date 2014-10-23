@@ -17,6 +17,9 @@ defmodule ApiV1Test do
 
     user = User.create(correct_id, correct_password, [tag1_entity, tag2_entity])
     User.verify user
+
+    Exredis.start |> Exredis.query ["FLUSHALL"]
+
     :ok
   end
 
@@ -163,6 +166,8 @@ defmodule ApiV1Test do
       (Token.extract(new_token, :exp) > 3) |> truthy # Not the best way, certainly
       Token.extract(new_token, :jti) |> equals Token.extract(old_token, :jti)
     end
+
+    it "updates session expiration time in Redis"
   end
 
   describe "CORS" do
@@ -211,25 +216,24 @@ defmodule ApiV1Test do
     end
 
     it "should return 400 for correct non-verification type token" do
-      #TODO dedulicate this
       token = generate_token(%{ sub: incorrect_id,
                                 typ: "some_other_token" })
       get_http_code('/user/verify?token=#{token}') |> 400
     end
 
     it "should return 404 for valid token for nonexistent user" do
-      token = Token.generate_verification_token(incorrect_id)
+      token = Token.generate_verification_token(incorrect_id, "")
       get_http_code('/user/verify?token=#{token}') |> 404
     end
 
     it "should return 409 if user is already verified" do
-      token = Token.generate_verification_token(correct_id)
+      token = Token.generate_verification_token(correct_id, "")
       get_http_code('/user/verify?token=#{token}') |> 409
     end
 
     it "should return 419 for an expired verification token" do
       post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password }) |> 201
-      token = Token.generate_verification_token(incorrect_id, -Settings.expiresIn - 1)
+      token = Token.generate_verification_token(incorrect_id, "", -Settings.expiresIn - 1)
       get_http_code('/user/verify?token=#{token}') |> 401 #NOTE see helpers.ex:38
     end
 
@@ -243,6 +247,8 @@ defmodule ApiV1Test do
       get_http_code('/user/verify?token=#{token}') |> 200
       post_http_code('/login', %{user_id: incorrect_id, password: incorrect_password}) |> 200
     end
+
+    it "shouldn't allow verification with mismatched jti"
   end
 
   describe "/user/proof_token" do
@@ -257,7 +263,7 @@ defmodule ApiV1Test do
     it "should prolong non-expired token" do
       User.create(incorrect_id, incorrect_password)
       # Brutal, but I can't invent anything better. No Timecop for Elixir at the moment
-      old_claims = Token.generate_verification_token(incorrect_id, -1)|> Token.parse
+      old_claims = User.verification_token_for(incorrect_id, -1)|> Token.parse
 
       new_claims = get('/user/proof_token?user_id=#{incorrect_id}') |> Token.parse
 
@@ -267,13 +273,13 @@ defmodule ApiV1Test do
 
     it "should reissue expired token" do
       User.create(incorrect_id, incorrect_password)
-      old_claims = Token.generate_verification_token(incorrect_id, - Settings.expiresIn - 1)|> Token.parse(:force)
+      old_claims = Token.generate_verification_token(incorrect_id, "", - Settings.expiresIn - 1)|> Token.parse(:force)
 
       new_claims = get('/user/proof_token?user_id=#{incorrect_id}') |> Token.parse
 
-      IO.inspect [old_claims.jti, new_claims.jti]
-
       old_claims.jti |> ! equals new_claims.jti
     end
+
+    it "renews expiration of the verification_session in Redis"
   end
 end

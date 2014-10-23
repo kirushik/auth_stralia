@@ -1,7 +1,9 @@
 defmodule AuthStralia.Storage.User do
   use Ecto.Model
-  alias AuthStralia.Storage.DB, as: DB
+
+  alias AuthStralia.Storage.DB
   alias AuthStralia.Storage.TagToUserMapping, as: TTUM
+  alias AuthStralia.Redis.VerificationSession
 
   schema "users", primary_key: { :user_id, :string, [] } do
     #TODO Validations
@@ -48,6 +50,11 @@ defmodule AuthStralia.Storage.User do
   end
   def tags(user) do
     user.tag_to_user_mappings.all |> Enum.map &(&1.tag_id)
+  end
+
+  def verification_token_for(user_id, time_correction \\ 0) do
+    session_id = VerificationSession.get user_id
+    Token.generate_verification_token user_id, session_id, time_correction
   end
 
   def verify(user) do
