@@ -11,6 +11,12 @@ defmodule Token do
     end
   end
 
+  def parse(token, :force) do
+    [_, claims_raw, _]= String.split(token, ".")
+    {:ok, claims} = claims_raw |> :base64url.decode |> JSON.decode
+    claims |> proplist_to_map
+  end
+
   def compose(contents, timeout \\ S.expiresIn) do
     :ejwt.jwt("HS256",{Map.to_list contents}, timeout, S.jwt_secret)
   end
@@ -24,6 +30,7 @@ defmodule Token do
     compose(contents, new_timeout)
   end
 
+  # FIXME needs test coverage
   def generate_verification_token(user_id, time_correction \\ 0) do
     if (Mix.env != :test && time_correction != 0), do: Logger.warn "Please use Token.generate_verification_token/2 only in testing!"
 

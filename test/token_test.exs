@@ -25,6 +25,13 @@ defmodule TokenTest do
       token = generate_token(%{},0)
       Token.parse(token) |> :expired
     end
+
+    it "correctly parses the expired token in forced mode" do
+      token = generate_token(%{},0)
+      %{exp: epoch()} |> equals Token.parse(token, :force)
+      Token.parse(token) |> :expired
+    end
+
     it "updates token's expiration time" do
       old_time = epoch() + 10
       new_time = epoch() + 1000

@@ -265,6 +265,15 @@ defmodule ApiV1Test do
       (old_claims.exp < new_claims.exp) |> truthy
     end
 
-    it "should reissue expired token"
+    it "should reissue expired token" do
+      User.create(incorrect_id, incorrect_password)
+      old_claims = Token.generate_verification_token(incorrect_id, - Settings.expiresIn - 1)|> Token.parse(:force)
+
+      new_claims = get('/user/proof_token?user_id=#{incorrect_id}') |> Token.parse
+
+      IO.inspect [old_claims.jti, new_claims.jti]
+
+      old_claims.jti |> ! equals new_claims.jti
+    end
   end
 end
