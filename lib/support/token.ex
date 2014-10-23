@@ -30,7 +30,6 @@ defmodule Token do
     compose(contents, new_timeout)
   end
 
-  # FIXME needs test coverage
   def generate_verification_token(user_id, time_correction \\ 0) do
     if (Mix.env != :test && time_correction != 0), do: Logger.warn "Please use Token.generate_verification_token/2 only in testing!"
 

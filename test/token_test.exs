@@ -27,14 +27,27 @@ defmodule TokenTest do
     end
 
     it "correctly parses the expired token in forced mode" do
+      now = epoch()
       token = generate_token(%{},0)
-      %{exp: epoch()} |> equals Token.parse(token, :force)
+      %{exp: now} |> equals Token.parse(token, :force)
+      #TODO This test would fail from time to time, only due to changed timestamp
       Token.parse(token) |> :expired
+    end
+
+    it "correctly issues user verification tokens" do
+      token = Token.generate_verification_token("username")
+      %{sub: "username", typ: "user_verification_token"} |> match?(Token.parse(token)) |> truthy
+    end
+
+    it "issues user verification tokens with proper time correction" do
+      now = epoch()
+      token = Token.generate_verification_token("username", 100)
+      Token.parse(token).exp |> equals now + Settings.expiresIn + 100
     end
 
     it "updates token's expiration time" do
       old_time = epoch() + 10
-      new_time = epoch() + 1000
+      new_time = old_time + 990
       token = generate_token(%{}, old_time)
       token |> Token.update_expiration_time(1000) |> Token.parse |> Map.get(:exp) |> new_time
     end
