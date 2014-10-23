@@ -25,26 +25,24 @@ defmodule Token do
     token |> parse |> Map.get(field)
   end
 
-  def update_expiration_time(token, new_timeout \\ S.expiresIn) do
-    contents =  case parse(token) do
-                :expired ->
-                  parse(token, :force) |>
-                  Map.delete(:exp)
-                claims ->
-                  Map.delete(claims, :exp)
-                end
-    compose(contents, new_timeout)
+  def update_expiration_time(token, new_expiration_time \\ S.expiresIn) do
+    case parse(token) do
+    :expired ->
+      parse(token, :force)
+    claims ->
+      claims
+    end |>
+    Map.delete(:exp) |>
+    compose(new_expiration_time)
   end
 
-  def generate_verification_token(user_id, session_id, time_correction \\ 0) do
-    if (Mix.env != :test && time_correction != 0), do: Logger.warn "Please use Token.generate_verification_token/2 only in testing!"
-
+  def generate_verification_token(user_id, session_id, expiration_time \\ S.expiresIn) do
     %{ sub: user_id,
         #TODO We should introduce hostname setting here
         iss: "auth.example.com",
         jti: session_id,
         typ: "user_verification_token"
-      } |> compose(S.expiresIn + time_correction)
+      } |> compose(expiration_time)
   end
 
   defp proplist_to_map(proplist) do

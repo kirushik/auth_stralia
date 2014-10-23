@@ -15,12 +15,16 @@ defmodule AuthStralia.Redis.VerificationSession do
                   else
                     UUID.generate
                   end
-    start |> query ["SETEX", key, S.expiresIn, session_id]
+    redis |> query ["SETEX", key, S.expiresIn, session_id]
   end
   def check(user_id, session_id) do
     key = "verification_session:#{user_id}"
     value = start |> query ["GET", key]
     value == session_id
+  end
+  def get_ttl(user_id) do
+    key = "verification_session:#{user_id}"
+    start |> query ["TTL", key]
   end
   def delete(user_id) do
     key = "verification_session:#{user_id}"

@@ -52,9 +52,9 @@ defmodule AuthStralia.Storage.User do
     user.tag_to_user_mappings.all |> Enum.map &(&1.tag_id)
   end
 
-  def verification_token_for(user_id, time_correction \\ 0) do
+  def verification_token_for(user_id, expiration_time \\ Settings.expiresIn) do
     session_id = VerificationSession.get user_id
-    Token.generate_verification_token user_id, session_id, time_correction
+    Token.generate_verification_token user_id, session_id, expiration_time
   end
 
   def verify(user) do

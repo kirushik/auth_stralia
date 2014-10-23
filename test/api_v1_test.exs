@@ -2,11 +2,22 @@ defmodule ApiV1Test do
   use Amrita.Sweet
   use Localhost
 
-  alias AuthStralia.Storage.User,  as: User
+  alias AuthStralia.Storage.User
+  alias AuthStralia.Redis.Session
 
   import TokenOperations
 
-  defp get_new_token, do: post('/login', %{user_id: correct_id, password: correct_password })
+  defp get_new_token(expiration_time \\ Settings.expiresIn) do
+    session_id = UUID.generate
+      data = %{ sub: correct_id,
+      #TODO We should introduce hostname setting here
+                iss: "auth.example.com",
+                jti: session_id,
+                tags: [] }
+
+    Session.new(correct_id, session_id)
+    Token.compose(data)
+  end
 
   setup_all do
     AuthStralia.Storage.DB.delete_all AuthStralia.Storage.TagToUserMapping
@@ -167,7 +178,9 @@ defmodule ApiV1Test do
       Token.extract(new_token, :jti) |> equals Token.extract(old_token, :jti)
     end
 
-    it "updates session expiration time in Redis"
+    it "updates session expiration time in Redis" do
+
+    end
   end
 
   describe "CORS" do
@@ -248,6 +261,7 @@ defmodule ApiV1Test do
       post_http_code('/login', %{user_id: incorrect_id, password: incorrect_password}) |> 200
     end
 
+    it "fails to validate without proper ValidationSession present in Redis"
     it "shouldn't allow verification with mismatched jti"
   end
 
@@ -263,7 +277,7 @@ defmodule ApiV1Test do
     it "should prolong non-expired token" do
       User.create(incorrect_id, incorrect_password)
       # Brutal, but I can't invent anything better. No Timecop for Elixir at the moment
-      old_claims = User.verification_token_for(incorrect_id, -1)|> Token.parse
+      old_claims = User.verification_token_for(incorrect_id, Settings.expiresIn-1)|> Token.parse
 
       new_claims = get('/user/proof_token?user_id=#{incorrect_id}') |> Token.parse
 

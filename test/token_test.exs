@@ -42,7 +42,7 @@ defmodule TokenTest do
     it "issues user verification tokens with proper time correction" do
       now = epoch()
       token = Token.generate_verification_token("username", "", 100)
-      Token.parse(token).exp |> equals now + Settings.expiresIn + 100
+      Token.parse(token).exp |> equals now + 100
     end
 
     it "updates token's expiration time" do
