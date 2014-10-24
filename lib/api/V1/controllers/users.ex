@@ -3,6 +3,7 @@ defmodule AuthStralia.API.V1.UsersController do
 
   alias AuthStralia.Storage.User
   alias AuthStralia.Redis.VerificationSession
+  alias AuthStralia.Redis.Session
 
   import Plug.Conn
   import AuthStralia.API.V1.Helpers
@@ -20,9 +21,7 @@ defmodule AuthStralia.API.V1.UsersController do
     case User.find_by_uid(user_id) do
     nil ->
       User.create(user_id, password)
-
       token = User.verification_token_for user_id
-
       send_201(conn, token)
     _ ->
       send_409(conn, "User #{user_id} is already in the database")
@@ -45,7 +44,7 @@ defmodule AuthStralia.API.V1.UsersController do
         if VerificationSession.check(user_id, verification_session_id) do
           User.verify user
           VerificationSession.delete user_id
-          http_ok(conn, "")
+          jwt_ok(conn, Session.new(user_id))
         else
           send_419 conn
         end

@@ -2,13 +2,23 @@ defmodule AuthStralia.Redis.Session do
   use Exredis
 
   alias Settings, as: S
+  alias AuthStralia.Storage.User
 
   # Key format is 'session:user_id:session_id'
   #TODO: add some useful info (ip?) about session in stored value
   #TODO: connection pool for Redis connections
-  def new(user_id, session_id, expiration_time \\ S.expiresIn) do
+  def new(user_id, expiration_time \\ S.expiresIn) do
+    session_id = UUID.generate
+
     key = "session:#{user_id}:#{session_id}"
     start |> query ["SETEX", key, expiration_time, "1"]
+
+    data = %{ sub: user_id,
+    #TODO We should introduce hostname setting here
+              iss: "auth.example.com",
+              jti: session_id,
+              tags: User.tags(user_id) }
+    Token.compose(data)
   end
   def check(user_id, session_id) do
     key = "session:#{user_id}:#{session_id}"

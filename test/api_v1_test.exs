@@ -9,15 +9,7 @@ defmodule ApiV1Test do
   import TokenOperations
 
   defp get_new_token(expiration_time \\ Settings.expiresIn) do
-    session_id = UUID.generate
-      data = %{ sub: correct_id,
-      #TODO We should introduce hostname setting here
-                iss: "auth.example.com",
-                jti: session_id,
-                tags: [] }
-
-    Session.new(correct_id, session_id, expiration_time)
-    Token.compose(data)
+    Session.new(correct_id, expiration_time)
   end
 
   setup_all do
@@ -197,6 +189,7 @@ defmodule ApiV1Test do
     end
   end
 
+  # FIXME CORS need to be implemented correctly, by one who knows what he's doing;)
   describe "CORS" do
     it "should be enabled for POST" do
       headers = post_headers('/login', %{user_id: correct_id, password: correct_password })
@@ -300,6 +293,12 @@ defmodule ApiV1Test do
       Exredis.start |> Exredis.query ["SETEX", "verification_session:#{incorrect_id}", Settings.expiresIn, ""]
       code = get_http_code('/user/verify?token=#{token}')
       code |> 401
+    end
+
+    it "should provide correct session token after successful verification" do
+      verification_token = post_201_response('/user/new', %{user_id: incorrect_id, password: incorrect_password })
+      session_token = get('/user/verify?token=#{verification_token}')
+      get('/verify_token?token=#{session_token}') |> "1"
     end
   end
 
