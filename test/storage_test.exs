@@ -49,7 +49,11 @@ defmodule StorageTest do
     end
 
     it "can check the password" do
-      User.create(user_id, password)
+      user = User.create(user_id, password)
+      User.check_password(user_id, password) |> falsey
+
+      User.verify user
+
       User.check_password(user_id, "qweqweqwe") |> falsey
       User.check_password(user_id, password) |> truthy
     end

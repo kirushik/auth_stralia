@@ -5,7 +5,9 @@ defmodule TokenOperations do
   alias Settings, as: S
   # May be yet another module for this?
   def correct_id, do: "alice@example.com"
+  def incorrect_id, do: "does.not.exist@example.com"
   def correct_password, do: "CorrectPassword"
+  def incorrect_password, do: "Incorrect password"
   def tag1, do: "qqq"
   def tag2, do: "Zu Zu Zu"
 
@@ -13,11 +15,11 @@ defmodule TokenOperations do
   def epoch do
     :calendar.datetime_to_gregorian_seconds(:calendar.now_to_universal_time(:os.timestamp())) - 719528 * 24 * 3600
   end
-  def generate_token(contents \\ {[ sub: correct_id,
+  def generate_token(contents \\ %{ sub: correct_id,
                                     iss: "auth.example.com",
-                                    jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" ]},
+                                    jti: "1282423E-D5EE-11E3-B368-4F7D74EB0A54" },
                       timeout \\ 86400) do
-    :ejwt.jwt("HS256", contents, timeout, S.jwt_secret)
+    :ejwt.jwt("HS256", {Map.to_list contents}, timeout, S.jwt_secret)
   end
 end
 
@@ -30,7 +32,7 @@ defmodule Localhost do
     quote bind_quoted: [api_version: api_version] do
       def get(relative_path, headers \\ []) do
         {:ok, {{_,200,_},_,response}} = Localhost.make_get_request(relative_path, unquote(api_version), headers)
-        List.to_string response
+        to_string response
       end
 
       def get_http_code(relative_path, headers \\ []) do
@@ -38,16 +40,33 @@ defmodule Localhost do
         code
       end
 
+      def fetch_headers(method, relative_path, headers \\ []) do
+        {:ok, {{_,200,_},resp_headers,_}} =  Localhost.make_request(method, relative_path, unquote(api_version), headers)
+        resp_headers
+      end
+
       def post(relative_path, params \\ %{}, headers \\ []) do
         params = Localhost.params_to_string(params)
         {:ok, {{_,200,_},_,response}} = Localhost.make_post_request(relative_path, unquote(api_version), headers, params)
-        List.to_string response
+        to_string response
+      end
+
+      def post_201_response(relative_path, params \\ %{}, headers \\ []) do
+        params = Localhost.params_to_string params
+        {:ok, {{_,201,_},_,response}} = Localhost.make_post_request(relative_path, unquote(api_version), headers, params)
+        to_string response
       end
 
       def post_http_code(relative_path, params \\ %{}, headers \\ []) do
         params = Localhost.params_to_string(params)
         {:ok, {{_,code,_},_,_}} = Localhost.make_post_request(relative_path, unquote(api_version), headers, params)
         code
+      end
+
+      def post_headers(relative_path, params \\ %{}, headers \\ []) do
+        params = Localhost.params_to_string(params)
+        {:ok, {{_,200,_},headers,_}} = Localhost.make_post_request(relative_path, unquote(api_version), headers, params)
+        headers
       end
     end
   end
@@ -71,9 +90,13 @@ defmodule Localhost do
   end
 
   def make_get_request(relative_path, api_version, headers) do
+    make_request(:get, relative_path, api_version, headers)
+  end
+
+  def make_request(method, relative_path, api_version, headers) do
     headers = prepare_headers headers
     :httpc.request(
-      :get,
+      method,
       {
         'http://localhost:#{S.port}/api/#{api_version}#{relative_path}',
         headers

@@ -6,7 +6,7 @@ defmodule AuthStralia.Mixfile do
   def project do
     [
       app: :auth_stralia,
-      version: "0.0.1",
+      version: "0.0.2",
       elixir: "~> 1.0.0",
       deps: deps
     ]
