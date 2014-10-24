@@ -14,7 +14,31 @@ defmodule AuthStralia.API.V1.Helpers do
     send_resp(200, data)
   end
 
+  def send_201(conn, data) do
+    send_resp(conn, 201, data)
+  end
+
+  def send_400 conn do
+    send_resp(conn, 400, "Unable to parse the token provided")
+  end
+
   def send_401 conn do
     send_resp(conn, 401, "Authorization failed")
+  end
+
+  def send_403 conn do
+    send_resp(conn, 403, "User is already verified")
+  end
+
+  def send_404 conn do
+    send_resp(conn, 404, "Not found")
+  end
+
+  def send_409(conn, data) do
+    send_resp(conn, 409, data)
+  end
+
+  def send_419 conn do
+    send_resp(conn, 401, "Your token has expired") #FIXME It's 401 because of Cowboy whitelisting http codes. Maybe submit a pull request there?
   end
 end

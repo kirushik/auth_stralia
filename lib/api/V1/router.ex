@@ -11,14 +11,14 @@ defmodule AuthStralia.API.V1.Router do
   plug :match
   plug :dispatch
 
-  # Enabling CORS on all the endpoints
   options _ do
     http_ok(conn, "")
   end
 
-  forward "login", to: AuthStralia.API.V1.LoginController
-  forward "verify_token", to: AuthStralia.API.V1.VerifyTokenController
-  forward "session", to: AuthStralia.API.V1.SessionController
+  forward "login", to: AuthStralia.API.V1.LoginsController
+  forward "user", to: AuthStralia.API.V1.UsersController
+  forward "verify_token", to: AuthStralia.API.V1.VerifyTokensController
+  forward "session", to: AuthStralia.API.V1.SessionsController
 
   defp enable_cors(conn, _opts) do
     conn |>

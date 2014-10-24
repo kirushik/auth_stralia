@@ -1,14 +1,18 @@
 defmodule AuthStralia.Storage.User do
   use Ecto.Model
-  alias AuthStralia.Storage.DB, as: DB
+
+  alias AuthStralia.Storage.DB
   alias AuthStralia.Storage.TagToUserMapping, as: TTUM
+  alias AuthStralia.Redis.VerificationSession
 
   schema "users", primary_key: { :user_id, :string, [] } do
     #TODO Validations
     field :salt
     field :password_hash
+    field :verified, :boolean
     has_many :tag_to_user_mappings, AuthStralia.Storage.TagToUserMapping, [foreign_key: :user_id]
   end
+
 
   #TODO We could do better than defaulting to empty passwords
   def create(user_id, password \\ "", tags \\ []) do
@@ -32,8 +36,13 @@ defmodule AuthStralia.Storage.User do
 
   def check_password(user_id, password) do
     user = find_by_uid(user_id)
-    #TODO Crypto string comparison
-    user != nil and user.password_hash == hash_password(password, user.salt)
+    if user==nil do
+      false
+    else
+      hash = hash_password(password, user.salt)
+      #TODO Crypto string comparison
+      match?( %AuthStralia.Storage.User{password_hash: ^hash, verified: true}, user)
+    end
   end
 
   def tags(user_id) when is_bitstring(user_id) do
@@ -41,6 +50,16 @@ defmodule AuthStralia.Storage.User do
   end
   def tags(user) do
     user.tag_to_user_mappings.all |> Enum.map &(&1.tag_id)
+  end
+
+  def verification_token_for(user_id, expiration_time \\ Settings.expiresIn) do
+    session_id = VerificationSession.get user_id, expiration_time
+    Token.generate_verification_token user_id, session_id, expiration_time
+  end
+
+  def verify(user) do
+    user = %{user | verified: true}
+    DB.update user
   end
 
   defp hash_password(password, salt) do

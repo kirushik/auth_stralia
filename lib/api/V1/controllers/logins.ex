@@ -1,4 +1,4 @@
-defmodule AuthStralia.API.V1.LoginController do
+defmodule AuthStralia.API.V1.LoginsController do
   use Plug.Router
 
   alias AuthStralia.Redis.Session, as: Session
@@ -17,20 +17,19 @@ defmodule AuthStralia.API.V1.LoginController do
     conn = conn |> fetch_params
     %{"user_id" => user_id, "password" => password} = conn.params
 
-
-    if (!User.check_password(user_id,password)) do
-      send_401 conn
-    else
+    if User.check_password(user_id,password) do
       session_id = UUID.generate
-      data = [ sub: user_id,
+      data = %{ sub: user_id,
       #TODO We should introduce hostname setting here
-               iss: "auth.example.com",
-               jti: session_id,
-               tags: User.tags(user_id) ]
+                iss: "auth.example.com",
+                jti: session_id,
+                tags: User.tags(user_id) }
 
       Session.new(user_id, session_id)
 
       jwt_ok conn, Token.compose(data)
+    else
+      send_401 conn
     end
   end
 end

@@ -1,4 +1,4 @@
-defmodule AuthStralia.API.V1.VerifyTokenController do
+defmodule AuthStralia.API.V1.VerifyTokensController do
   use Plug.Router
 
   alias AuthStralia.Redis.Session, as: Session
@@ -15,8 +15,8 @@ defmodule AuthStralia.API.V1.VerifyTokenController do
     %{"token" => token} = conn.params
     res = case Token.parse(token) do
       :invalid -> "0"
-      parsed when is_list(parsed) ->
-        Session.check(Token.get(parsed, "sub"), Token.get(parsed, "jti"))
+      parsed when is_map(parsed) ->
+        Session.check(parsed.sub, parsed.jti)
       _ -> "0"
     end
     http_ok(conn, res)

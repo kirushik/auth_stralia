@@ -1,4 +1,4 @@
-defmodule AuthStralia.API.V1.SessionController do
+defmodule AuthStralia.API.V1.SessionsController do
   use Plug.Router
 
   alias AuthStralia.Redis.Session, as: Session
@@ -18,22 +18,22 @@ defmodule AuthStralia.API.V1.SessionController do
     jti = if Dict.has_key?(conn.params, :jti) do
       conn.params.jti
     else
-      Token.extract(token, "jti")
+      Token.extract(token, :jti)
     end
-    sub = Token.extract(token, "sub")
+    sub = Token.extract(token, :sub)
 
     http_ok(conn, Session.remove(sub, jti))
   end
 
   post "invalidate/all" do
     token = conn.private[:token]
-    sub = Token.extract(token, "sub")
+    sub = Token.extract(token, :sub)
     http_ok(conn, Session.remove_all(sub))
   end
 
   get "list" do
     token = conn.private[:token]
-    sub = Token.extract(token, "sub")
+    sub = Token.extract(token, :sub)
     json_ok(conn, JSON.encode!(Session.list(sub)))
   end
 

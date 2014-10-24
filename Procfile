@@ -1,1 +1,1 @@
-web: env MIX_ENV=prod mix run --erl "+K true" -e ":timer.sleep(:infinity)"
+web: env MIX_ENV=prod mix run --erl "+K true" --no-halt
