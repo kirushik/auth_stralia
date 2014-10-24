@@ -33,7 +33,9 @@ defmodule AuthStralia.Mixfile do
       {:json, github: "cblage/elixir-json"},
       {:postgrex, github: "ericmj/postgrex", tag: "v0.6.0", override: true},
       {:ecto, "0.2.5"},
-      {:pbkdf2, github: "basho/erlang-pbkdf2", tag: "2.0.0"}
+      {:pbkdf2, github: "basho/erlang-pbkdf2", tag: "2.0.0"},
+
+      {:dialyze, "~> 0.1.3"}
     ]
   end
 end
