@@ -53,7 +53,7 @@ defmodule AuthStralia.Storage.User do
   end
 
   def verification_token_for(user_id, expiration_time \\ Settings.expiresIn) do
-    session_id = VerificationSession.get user_id
+    session_id = VerificationSession.get user_id, expiration_time
     Token.generate_verification_token user_id, session_id, expiration_time
   end
 

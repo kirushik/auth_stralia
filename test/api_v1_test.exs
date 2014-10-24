@@ -71,7 +71,10 @@ defmodule ApiV1Test do
       post_http_code('/login', %{user_id: incorrect_id, password: incorrect_password}) |> 401
     end
 
-    it "returns token with the same TTL as in Redis"
+    it "returns token with the same TTL as in Redis" do
+      claims = post('/login', %{user_id: correct_id, password: correct_password }) |> Token.parse
+      Session.get_ttl(claims.sub, claims.jti) |> equals to_string(claims.exp - epoch())
+    end
   end
 
   describe "/verify_token" do
@@ -233,7 +236,10 @@ defmodule ApiV1Test do
       post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password }) |> 409
     end
 
-    it "should return token with TTL same as in Redis"
+    it "should return token with TTL same as in Redis" do
+      claims = post_201_response('/user/new', %{user_id: incorrect_id, password: incorrect_password }) |> Token.parse
+      VerificationSession.get_ttl(incorrect_id) |> equals to_string(claims.exp - epoch())
+    end
   end
 
   describe "/user/verify" do
@@ -326,6 +332,16 @@ defmodule ApiV1Test do
       old_claims.jti |> ! equals new_claims.jti
     end
 
-    it "renews expiration of the verification_session in Redis"
+    it "renews expiration of the verification_session in Redis" do
+      User.create(incorrect_id, incorrect_password)
+      User.verification_token_for(incorrect_id, Settings.expiresIn-1)|> Token.parse
+      VerificationSession.get_ttl(incorrect_id) |> ! equals to_string(Settings.expiresIn)
+
+
+      get('/user/proof_token?user_id=#{incorrect_id}') |> Token.parse
+
+      VerificationSession.get_ttl(incorrect_id) |> equals to_string(Settings.expiresIn)
+      VerificationSession.get_ttl(incorrect_id) |> equals to_string(Settings.expiresIn)
+    end
   end
 end
