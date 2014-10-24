@@ -4,6 +4,7 @@ defmodule ApiV1Test do
 
   alias AuthStralia.Storage.User
   alias AuthStralia.Redis.Session
+  alias AuthStralia.Redis.VerificationSession
 
   import TokenOperations
 
@@ -35,8 +36,11 @@ defmodule ApiV1Test do
   end
 
   setup do
+    VerificationSession.delete incorrect_id
+
     incorrect_user = User.find_by_uid(incorrect_id)
     if incorrect_user, do: AuthStralia.Storage.DB.delete incorrect_user
+
     :ok
   end
 
@@ -66,6 +70,8 @@ defmodule ApiV1Test do
       User.create(incorrect_id, incorrect_password)
       post_http_code('/login', %{user_id: incorrect_id, password: incorrect_password}) |> 401
     end
+
+    it "returns token with the same TTL as in Redis"
   end
 
   describe "/verify_token" do
@@ -226,6 +232,8 @@ defmodule ApiV1Test do
       post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password }) |> 201
       post_http_code('/user/new', %{user_id: incorrect_id, password: incorrect_password }) |> 409
     end
+
+    it "should return token with TTL same as in Redis"
   end
 
   describe "/user/verify" do
@@ -257,16 +265,30 @@ defmodule ApiV1Test do
 
     it "should return 200 for correct verification request" do
       token = post_201_response('/user/new', %{user_id: incorrect_id, password: incorrect_password })
-      get_http_code('/user/verify?token=#{token}') |> 200
+      code = get_http_code('/user/verify?token=#{token}')
+      code |> 200
     end
 
     it "should allow user to login after the verification" do
       token = post_201_response('/user/new', %{user_id: incorrect_id, password: incorrect_password })
-      get_http_code('/user/verify?token=#{token}') |> 200
-      post_http_code('/login', %{user_id: incorrect_id, password: incorrect_password}) |> 200
+      code = get_http_code('/user/verify?token=#{token}')
+      code |> 200
+
+      code = post_http_code('/login', %{user_id: incorrect_id, password: incorrect_password})
+      code |> 200
     end
 
-    it "fails to validate without proper ValidationSession present in Redis"
+    it "fails to validate without proper ValidationSession present in Redis" do
+      token = post_201_response('/user/new', %{user_id: incorrect_id, password: incorrect_password })
+      AuthStralia.Redis.VerificationSession.delete incorrect_id
+
+      code = get_http_code('/user/verify?token=#{token}')
+      # When macros are used in amrita matcher directly, they are being called twice for some reason
+      # TODO So all the tests should be rewritten to avoid those duplications
+      # Or maybe ditch Amrita altogether in favor of bare ExUnit?
+      code |> 401
+    end
+
     it "shouldn't allow verification with mismatched jti"
   end
 

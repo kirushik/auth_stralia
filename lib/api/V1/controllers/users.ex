@@ -1,7 +1,8 @@
 defmodule AuthStralia.API.V1.UsersController do
   use Plug.Router
 
-  alias AuthStralia.Storage.User,  as: User
+  alias AuthStralia.Storage.User
+  alias AuthStralia.Redis.VerificationSession
 
   import Plug.Conn
   import AuthStralia.API.V1.Helpers
@@ -34,15 +35,20 @@ defmodule AuthStralia.API.V1.UsersController do
 
     case Token.parse(token) do
 
-    %{typ: "user_verification_token", sub: user_id} ->
+    %{typ: "user_verification_token", sub: user_id, jti: verification_session_id} ->
       case User.find_by_uid user_id do
       nil ->
         send_404 conn
       %User{verified: true} ->
         send_409(conn, "User #{user_id} is already verified")
       user ->
-        User.verify user
-        http_ok(conn, "")
+        if VerificationSession.check(user_id, verification_session_id) do
+          User.verify user
+          VerificationSession.delete user_id
+          http_ok(conn, "")
+        else
+          send_419 conn
+        end
       end
 
     :expired ->

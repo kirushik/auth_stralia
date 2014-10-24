@@ -16,6 +16,7 @@ defmodule AuthStralia.Redis.VerificationSession do
                     UUID.generate
                   end
     redis |> query ["SETEX", key, expiration_time, session_id]
+    session_id
   end
   def check(user_id, session_id) do
     key = "verification_session:#{user_id}"
