@@ -7,7 +7,8 @@ defmodule Token do
     case :ejwt.parse_jwt(token, S.jwt_secret) do
       {parsed_token} -> proplist_to_map(parsed_token)
       :expired -> :expired
-      _ -> :invalid
+      _ ->
+       :invalid
     end
   end
 

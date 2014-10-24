@@ -10,10 +10,11 @@ defmodule AuthStralia.Redis.VerificationSession do
     key = "verification_session:#{user_id}"
     redis = start
 
-    session_id =  if redis |> query ["EXISTS", key] do
-                    redis |> query ["GET", key]
-                  else
+    session_id =  case redis |> query ["GET", key] do
+                  :undefined ->
                     UUID.generate
+                  value ->
+                    value
                   end
     redis |> query ["SETEX", key, expiration_time, session_id]
     session_id

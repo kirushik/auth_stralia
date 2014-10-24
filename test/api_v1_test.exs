@@ -289,7 +289,12 @@ defmodule ApiV1Test do
       code |> 401
     end
 
-    it "shouldn't allow verification with mismatched jti"
+    it "shouldn't allow verification with mismatched jti" do
+      token = post_201_response('/user/new', %{user_id: incorrect_id, password: incorrect_password })
+      Exredis.start |> Exredis.query ["SETEX", "verification_session:#{incorrect_id}", Settings.expiresIn, ""]
+      code = get_http_code('/user/verify?token=#{token}')
+      code |> 401
+    end
   end
 
   describe "/user/proof_token" do
